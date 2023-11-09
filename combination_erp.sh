@@ -2,7 +2,6 @@ screen_width=1920
 screen_height=1080
 isi=1000
 fs=256
-channels="['EEG_Fp1', 'EEG_Fp2']"
 image_path="./images"
 tops_order=1
 clothes_type="bottoms"
@@ -13,12 +12,11 @@ result_dir="./plot"
 result_dir_num=0
 
 
-python -u ./src/erp_combination.py \
+python -u erp_combination.py \
     --screen_width=${screen_width} \
     --screen_height=${screen_height} \
     --isi=${isi} \
     --fs=${fs} \
-    --channels=${channels} \
     --image_path=${image_path} \
     --tops_order=${tops_order} \
     --clothes_type=${clothes_type} \
