@@ -91,19 +91,19 @@ class AnalyzeEEG:
         erd_times_list = []
         for i in range(1, num_types + 1):
             erd_avg_evoked, erd_times = self.preprocess_eeg.epochs(
-                eeg, events=events, event_id=i, tmin=tmin, tmax=tmax
+                erd_eeg, events=events, event_id=i, tmin=tmin, tmax=tmax
             )
             erd_avg_evoked_list.append(erd_avg_evoked)
-            erd_times_list.append(erd_times)
+            erd_times_list.append(erd_times[:-1])
 
         ers_avg_evoked_list = []
         ers_times_list = []
         for i in range(1, num_types + 1):
             ers_avg_evoked, ers_times = self.preprocess_eeg.epochs(
-                eeg, events=events, event_id=i, tmin=tmin, tmax=tmax
+                ers_eeg, events=events, event_id=i, tmin=tmin, tmax=tmax
             )
             ers_avg_evoked_list.append(ers_avg_evoked)
-            ers_times_list.append(ers_times)
+            ers_times_list.append(ers_times[:-1])
         return (
             eeg,
             eeg_times,

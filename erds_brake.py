@@ -4,20 +4,19 @@ from datetime import datetime
 
 import pandas as pd
 
-from src.task import combination_task
+from src.task import brake_task
 from src.analysis import AnalyzeEEG
 from src.plot import PlotEEG
-from src.recommendation import recommend
 
 
-def erp_combination(
+def erds_brake(
     screen_width: int,
     screen_height: int,
     fs: int,
     channels: List,
     isi: int,
-    top_image_path: str,
-    clothes_type: str,
+    obstacle_playing_time: int,
+    background_path: str,
     image_folder: str,
     num_trials: int,
     num_images: int,
@@ -30,16 +29,16 @@ def erp_combination(
     if not os.path.exists(f"./event/{today}"):
         os.makedirs(f"./event/{today}")
 
-    combination_task(
+    brake_task(
         screen_width=screen_width,
         screen_height=screen_height,
         isi=isi,
-        top_image_path=top_image_path,
+        obstacle_playing_time=obstacle_playing_time,
+        background_path=background_path,
         image_folder=image_folder,
         num_trials=num_trials,
         num_images=num_images,
         event_save_path=f"{event_save_path}/{today}",
-        clothes_type=clothes_type
     )
 
     rawdata_folders = os.listdir("C:/MAVE_RawData")
@@ -60,7 +59,7 @@ def erp_combination(
     event_file = f"./event/{today}/{event_paths[-1]}"
 
     analyze_eeg = AnalyzeEEG(channels=channels, fs=fs)
-    eeg, eeg_times, avg_evoked_list, times_list = analyze_eeg.analyze_erp(
+    eeg, eeg_times, erd_avg_evoked_list, erd_times_list, ers_avg_evoked_list, ers_times_list = analyze_eeg.analyze_erds(
         eeg_filename=data_file_path,
         event_filename=event_file,
         result_dir=result_dir,
@@ -77,29 +76,18 @@ def erp_combination(
         eeg_filename="eeg_raw",
     )
     plot_eeg.plot_eeg()
-    if clothes_type == "bottoms":
-        for i in range(num_images):
-            plot_eeg.plot_electrode(
-                avg_evoked_list[i],
-                times_list[i],
-                filename=f"bottoms_{i+1}_electrode",
-            )
-    elif clothes_type == "shoes":
-        for i in range(num_images):
-            plot_eeg.plot_electrode(
-                avg_evoked_list[i],
-                times_list[i],
-                filename=f"shoes_{i+1}_electrode",
-            )
-    else:
-        raise ValueError("Invalid clothes type")
-
-    recommend(
-        avg_evoked_list=avg_evoked_list,
-        times_list=times_list,
-        channels=channels,
-        clothes_type=clothes_type,
-    )
+    for i in range(num_images):
+        plot_eeg.plot_electrode(
+            erd_avg_evoked_list[i],
+            erd_times_list[i],
+            filename=f"brake_erd_{i+1}_electrode",
+        )
+    for i in range(num_images):
+        plot_eeg.plot_electrode(
+            ers_avg_evoked_list[i],
+            ers_times_list[i],
+            filename=f"brake_ers_{i+1}_electrode",
+        )
 
 
 if __name__ == "__main__":
@@ -117,19 +105,19 @@ if __name__ == "__main__":
             raise argparse.ArgumentTypeError("Invalid list format")
 
     parser = argparse.ArgumentParser(
-        description="Insert arguments for function of erp combination"
+        description="Insert arguments for function of erp brake"
     )
     parser.add_argument(
         "--screen_width",
         type=int,
         default=1920,
-        help="Set screen width of combination task",
+        help="Set screen width of brake task",
     )
     parser.add_argument(
         "--screen_height",
         type=int,
         default=1080,
-        help="Set screen height of combination task",
+        help="Set screen height of brake task",
     )
     parser.add_argument(
         "--fs", type=int, default=256, help="Get resolution of EEG device"
@@ -143,8 +131,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "--isi",
         type=int,
-        default=1000,
-        help="Set inter-stimulus interval of combination task",
+        default=7000,
+        help="Set inter-stimulus interval of brake task",
+    )
+    parser.add_argument(
+        "--obstacle_playing_time",
+        type=int,
+        default=1500,
+        help="Set obstacle playing time of brake task",
     )
     parser.add_argument(
         "--image_path",
@@ -153,27 +147,21 @@ if __name__ == "__main__":
         help="Get image data path to use in the task",
     )
     parser.add_argument(
-        "--tops_order",
+        "--backgrounds_order",
         type=int,
         default=1,
         help="Set order of upper clothes to use in the task",
     )
     parser.add_argument(
-        "--clothes_type",
-        type=str,
-        default="bottoms",
-        help="Set type of clothes to use in the task",
-    )
-    parser.add_argument(
         "--num_trials",
         type=int,
-        default=10,
+        default=8,
         help="Set number of trials to use in the task",
     )
     parser.add_argument(
         "--num_images",
         type=int,
-        default=30,
+        default=4,
         help="Set number of clothes to use in the task",
     )
     parser.add_argument(
@@ -191,22 +179,22 @@ if __name__ == "__main__":
     parser.add_argument(
         "--result_dir_num",
         type=int,
-        default=0,
+        default=5,
         help="Set a EEG, ERP plots detailed saving path",
     )
     args = parser.parse_args()
 
-    erp_combination(
+    erds_brake(
         screen_width=args.screen_width,
         screen_height=args.screen_height,
-        isi=args.isi,
         fs=args.fs,
         channels=args.channels,
-        top_image_path=f"{args.image_path}/tops/T{args.tops_order}.jpg",
-        image_folder=f"{args.image_path}/{args.clothes_type}",
-        clothes_type=f"{args.clothes_type}",
+        isi=args.isi,
+        obstacle_playing_time=args.obstacle_playing_time,
+        background_path=f"{args.image_path}/backgrounds/B{args.backgrounds_order}.mp4",
+        image_folder=f"{args.image_path}/obstacles",
         num_trials=args.num_trials,
         num_images=args.num_images,
         event_save_path=f"{args.event_save_path}",
-        result_dir=f"{args.result_dir}/{args.clothes_type}/{args.result_dir_num}",
+        result_dir=f"{args.result_dir}/brake/{args.result_dir_num}",
     )
