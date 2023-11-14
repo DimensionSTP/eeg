@@ -4,12 +4,12 @@ from datetime import datetime
 
 import pandas as pd
 
-from src.task import brake_task
+from src.task import grap_task
 from src.analysis import AnalyzeEEG
 from src.plot import PlotEEG
 
 
-def erds_brake(
+def erds_grap(
     screen_width: int,
     screen_height: int,
     fs: int,
@@ -22,6 +22,7 @@ def erds_brake(
     num_images: int,
     event_save_path: str,
     result_dir: str,
+    value_dir: str,
 ):
     today = str(datetime.now().date())
     if not os.path.exists(f"./data/{today}"):
@@ -29,7 +30,7 @@ def erds_brake(
     if not os.path.exists(f"./event/{today}"):
         os.makedirs(f"./event/{today}")
 
-    brake_task(
+    grap_task(
         screen_width=screen_width,
         screen_height=screen_height,
         isi=isi,
@@ -59,12 +60,36 @@ def erds_brake(
     event_file = f"./event/{today}/{event_paths[-1]}"
 
     analyze_eeg = AnalyzeEEG(channels=channels, fs=fs)
-    eeg, eeg_times, erd_avg_evoked_list, erd_times_list, ers_avg_evoked_list, ers_times_list = analyze_eeg.analyze_erds(
+    eeg, eeg_times, erds_avg_evoked_list, erds_times_list, erds_whole_avg_evoked_list, erds_whole_times_list = analyze_eeg.analyze_whole_erds(
         eeg_filename=data_file_path,
         event_filename=event_file,
         result_dir=result_dir,
-        num_types=num_images,
     )
+
+    for channel in range(len(channels)):
+        if not os.path.exists(f"{value_dir}/erds"):
+            os.makedirs(f"{value_dir}/erds")
+        erds_df = pd.DataFrame(
+            zip(erds_avg_evoked_list[0][channel], erds_times_list[0]),
+            columns=["avg_evoked", "order"]
+        )
+        erds_df.to_csv(
+            f"{value_dir}/erds/EEG_Fp{channel+1}.csv",
+            encoding="utf-8-sig",
+            index=False,
+        )
+    for channel in range(len(channels)):
+        if not os.path.exists(f"{value_dir}/erds_whole"):
+            os.makedirs(f"{value_dir}/erds_whole")
+        erds_whole_df = pd.DataFrame(
+            zip(erds_whole_avg_evoked_list[0][channel], erds_whole_times_list[0]),
+            columns=["avg_evoked", "order"]
+        )
+        erds_whole_df.to_csv(
+            f"{value_dir}/erds_whole/EEG_Fp{channel+1}.csv",
+            encoding="utf-8-sig",
+            index=False,
+        )
 
     plot_eeg = PlotEEG(
         channels=channels,
@@ -76,18 +101,16 @@ def erds_brake(
         eeg_filename="eeg_raw",
     )
     plot_eeg.plot_eeg()
-    for i in range(num_images):
-        plot_eeg.plot_electrode(
-            erd_avg_evoked_list[i],
-            erd_times_list[i],
-            filename=f"brake_erd_{i+1}_electrode",
-        )
-    for i in range(num_images):
-        plot_eeg.plot_electrode(
-            ers_avg_evoked_list[i],
-            ers_times_list[i],
-            filename=f"brake_ers_{i+1}_electrode",
-        )
+    plot_eeg.plot_electrode(
+        erds_avg_evoked_list[0],
+        erds_times_list[0],
+        filename=f"grap_erds_electrode",
+    )
+    plot_eeg.plot_electrode(
+        erds_whole_avg_evoked_list[0],
+        erds_whole_times_list[0],
+        filename=f"grap_erds_whole_electrode",
+    )
 
 
 if __name__ == "__main__":
@@ -105,19 +128,19 @@ if __name__ == "__main__":
             raise argparse.ArgumentTypeError("Invalid list format")
 
     parser = argparse.ArgumentParser(
-        description="Insert arguments for function of erds brake"
+        description="Insert arguments for function of erds grap"
     )
     parser.add_argument(
         "--screen_width",
         type=int,
         default=1920,
-        help="Set screen width of brake task",
+        help="Set screen width of grap task",
     )
     parser.add_argument(
         "--screen_height",
         type=int,
         default=1080,
-        help="Set screen height of brake task",
+        help="Set screen height of grap task",
     )
     parser.add_argument(
         "--fs", type=int, default=256, help="Get resolution of EEG device"
@@ -132,13 +155,13 @@ if __name__ == "__main__":
         "--isi",
         type=int,
         default=7000,
-        help="Set inter-stimulus interval of brake task",
+        help="Set inter-stimulus interval of grap task",
     )
     parser.add_argument(
         "--obstacle_playing_time",
         type=int,
         default=1500,
-        help="Set obstacle playing time of brake task",
+        help="Set obstacle playing time of grap task",
     )
     parser.add_argument(
         "--image_path",
@@ -177,14 +200,20 @@ if __name__ == "__main__":
         help="Set a EEG, ERDS plots saving path",
     )
     parser.add_argument(
-        "--result_dir_num",
+        "--value_dir",
+        type=str,
+        default="./value",
+        help="Set a EEG, ERDS values saving path",
+    )
+    parser.add_argument(
+        "--dir_num",
         type=int,
         default=0,
-        help="Set a EEG, ERDS plots detailed saving path",
+        help="Set a EEG, ERDS plots and values detailed saving path",
     )
     args = parser.parse_args()
 
-    erds_brake(
+    erds_grap(
         screen_width=args.screen_width,
         screen_height=args.screen_height,
         fs=args.fs,
@@ -196,5 +225,6 @@ if __name__ == "__main__":
         num_trials=args.num_trials,
         num_images=args.num_images,
         event_save_path=f"{args.event_save_path}",
-        result_dir=f"{args.result_dir}/brake/{args.result_dir_num}",
+        result_dir=f"{args.result_dir}/grap/{args.dir_num}",
+        value_dir=f"{args.value_dir}/grap/{args.dir_num}",
     )

@@ -112,3 +112,66 @@ class AnalyzeEEG:
             ers_avg_evoked_list,
             ers_times_list,
         )
+
+
+    def analyze_whole_erds(
+        self,
+        eeg_filename: str,
+        event_filename: str,
+        result_dir: str,
+    ):
+        # Check result directory
+        if not os.path.isdir(os.path.join(os.getcwd(), result_dir)):
+            os.mkdir(os.path.join(os.getcwd(), result_dir))
+
+        # Read eeg and events
+        eeg, eeg_times = self.preprocess_eeg.read_eeg(eeg_filename)
+        events = self.preprocess_eeg.read_events(event_filename)
+
+        # Synchronize time interval
+        eeg_start_tm = eeg_filename.split("_")[-1].replace(".csv", "")
+        event_start_tm = event_filename.split("_")[-1].replace(".csv", "")
+        events = self.preprocess_eeg.synchronize_time_interval(
+            events, eeg_start_tm, event_start_tm
+        )
+
+        # Apply filter
+        erds_eeg = copy.deepcopy(eeg)
+        erds_whole_eeg = copy.deepcopy(eeg)
+        self.preprocess_eeg.filter(erds_eeg, lowcut=8, highcut=12)  # ERD (Alpha)
+        self.preprocess_eeg.filter(erds_whole_eeg, lowcut=8, highcut=30)  # ERS (Beta)
+
+        # Squaring
+        erds_eeg = self.preprocess_eeg.square(erds_eeg)
+        erds_whole_eeg = self.preprocess_eeg.square(erds_whole_eeg)
+
+        # Smoothing
+        erds_eeg = self.preprocess_eeg.moving_average(erds_eeg)
+        erds_whole_eeg = self.preprocess_eeg.moving_average(erds_whole_eeg)
+
+        # Analysis evoked potential
+        tmin, tmax = -4.0, 4.0
+
+        erds_avg_evoked_list = []
+        erds_times_list = []
+        erds_avg_evoked, erds_times = self.preprocess_eeg.epochs(
+            erds_eeg, events=events, event_id=0, tmin=tmin, tmax=tmax
+        )
+        erds_avg_evoked_list.append(erds_avg_evoked)
+        erds_times_list.append(erds_times[:-1])
+
+        erds_whole_avg_evoked_list = []
+        erds_whole_times_list = []
+        erds_whole_avg_evoked, erds_whole_times = self.preprocess_eeg.epochs(
+            erds_whole_eeg, events=events, event_id=0, tmin=tmin, tmax=tmax
+        )
+        erds_whole_avg_evoked_list.append(erds_whole_avg_evoked)
+        erds_whole_times_list.append(erds_whole_times[:-1])
+        return (
+            eeg,
+            eeg_times,
+            erds_avg_evoked_list,
+            erds_times_list,
+            erds_whole_avg_evoked_list,
+            erds_whole_times_list,
+        )
