@@ -127,7 +127,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--frequencies",
         type=parse_list,
-        default="[13, 27, 20, 18]",
+        default="[27, 13, 19, 23]",
         help="Get frequencies to use in the task",
     )
     parser.add_argument(

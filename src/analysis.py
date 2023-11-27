@@ -190,6 +190,7 @@ class AnalyzeEEG:
 
         # Read eeg and events
         fft = pd.read_csv(fft_filename)
+        fft = fft.iloc[22:, :]
         avg_values = {f"{float(frequency):.2f}Hz": fft.loc[:, f"{float(frequency-freq_range):.2f}Hz":f"{float(frequency+freq_range):.2f}Hz"].mean(axis=1) for frequency in frequencies
         }
         avg_df = pd.DataFrame(avg_values)
