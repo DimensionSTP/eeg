@@ -1,6 +1,7 @@
 import datetime
 import time
 import csv
+from typing import List
 
 import pygame
 import cv2
@@ -278,5 +279,81 @@ def grap_task(
     # 동영상 및 Pygame 종료
     cap.release()
     cv2.destroyAllWindows()
+    pygame.quit()
+    time.sleep(10)
+
+
+def quiz_task(
+    screen_width: int,
+    screen_height: int,
+    image_folder: str,
+    frequencies: List,
+    experiment_duration: int,
+):
+    # Pygame 초기화
+    pygame.init()
+
+    # 화면 크기 및 설정
+    screen_width = screen_width
+    screen_height = screen_height
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    pygame.display.set_caption("SSVEP Experiment")
+
+    # 이미지 로딩
+    images = [pygame.image.load(f"{image_folder}/{i}.png") for i in range(1, 9)]
+
+    # 이미지 위치 및 크기 계산
+    image_width, image_height = images[0].get_size()
+    image_positions = [
+        ((screen_width / 4) - (image_width / 2), (screen_height / 4) - (image_height / 2)),  # 상단 왼쪽
+        ((screen_width * 3 / 4) - (image_width / 2), (screen_height / 4) - (image_height / 2)),  # 상단 오른쪽
+        ((screen_width / 4) - (image_width / 2), (screen_height * 3 / 4) - (image_height / 2)),  # 하단 왼쪽
+        ((screen_width * 3 / 4) - (image_width / 2), (screen_height * 3 / 4) - (image_height / 2))  # 하단 오른쪽
+    ]
+
+    # 주파수에 따른 이미지 변경 주기 계산
+    change_intervals = [1 / f for f in frequencies]
+
+    # 타이머 및 이미지 인덱스 초기화
+    timers = [time.time()] * 4
+    current_images = [0, 2, 4, 6]  # 각 화면별 첫 이미지 인덱스
+
+    # 실험 시작 시간
+    experiment_start_time = time.time()
+
+    # 메인 루프
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+        # 실험 시간이 지나면 종료
+        if time.time() - experiment_start_time >= experiment_duration:
+            running = False
+
+        # 각 화면별 이미지 변경
+        for i in range(4):
+            if time.time() - timers[i] >= change_intervals[i]:
+                current_images[i] = (current_images[i] + 1) % 2 + i * 2  # 각 화면별로 다음 이미지 선택
+                timers[i] = time.time()
+
+        # 화면 지우기
+        screen.fill((0, 0, 0))
+
+        # 각 화면에 이미지 표시
+        for i in range(4):
+            rect = images[current_images[i]].get_rect()
+            rect.topleft = image_positions[i]
+            screen.blit(images[current_images[i]], rect)
+
+        # 중앙 고정점 그리기 (예: 하얀색 십자가)
+        cross_center = (screen_width / 2, screen_height / 2)
+        pygame.draw.line(screen, (255, 255, 255), (cross_center[0] - 10, cross_center[1]), (cross_center[0] + 10, cross_center[1]), 2)
+        pygame.draw.line(screen, (255, 255, 255), (cross_center[0], cross_center[1] - 10), (cross_center[0], cross_center[1] + 10), 2)
+
+        pygame.display.flip()
+
+    # Pygame 종료
     pygame.quit()
     time.sleep(10)

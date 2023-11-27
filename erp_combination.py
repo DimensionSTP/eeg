@@ -7,7 +7,7 @@ import pandas as pd
 from src.task import combination_task
 from src.analysis import AnalyzeEEG
 from src.plot import PlotEEG
-from src.recommendation import recommend
+from src.recommendation import recommend_combination
 
 
 def erp_combination(
@@ -94,7 +94,7 @@ def erp_combination(
     else:
         raise ValueError("Invalid clothes type")
 
-    recommend(
+    recommend_combination(
         avg_evoked_list=avg_evoked_list,
         times_list=times_list,
         channels=channels,

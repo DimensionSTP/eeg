@@ -2,6 +2,7 @@ import os
 from typing import List
 
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
 class PlotEEG:
@@ -120,3 +121,20 @@ class PlotEEG:
             if self.is_show:
                 self.show_plot()
             self.clean_plot()
+
+
+def plot_ssvep(
+    df: pd.DataFrame,
+    save_path: str,
+    figsize: tuple = (15,8),
+):
+    plt.figure(figsize=figsize)
+    for freq, values in df.items():
+        plt.plot(df.index, values, label=f"Average around {freq}")
+    
+    plt.xlabel("Time")
+    plt.ylabel("Average FFT Values")
+    plt.title("Average FFT Values over Time for Selected Frequencies")
+    plt.legend()
+    plt.xticks(rotation=45)
+    plt.savefig(save_path)

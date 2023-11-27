@@ -2,6 +2,8 @@ import os
 import copy
 from typing import List
 
+import pandas as pd
+
 from .preprocess import PreprocessEEG
 
 
@@ -17,8 +19,8 @@ class AnalyzeEEG:
         num_types: int,
     ):
         # Check result directory
-        if not os.path.isdir(os.path.join(os.getcwd(), result_dir)):
-            os.mkdir(os.path.join(os.getcwd(), result_dir))
+        if not os.path.isdir(result_dir):
+            os.makedirs(result_dir)
 
         # Read eeg and events
         eeg, eeg_times = self.preprocess_eeg.read_eeg(eeg_filename)
@@ -56,8 +58,8 @@ class AnalyzeEEG:
         num_types: int,
     ):
         # Check result directory
-        if not os.path.isdir(os.path.join(os.getcwd(), result_dir)):
-            os.mkdir(os.path.join(os.getcwd(), result_dir))
+        if not os.path.isdir(result_dir):
+            os.makedirs(result_dir)
 
         # Read eeg and events
         eeg, eeg_times = self.preprocess_eeg.read_eeg(eeg_filename)
@@ -113,7 +115,6 @@ class AnalyzeEEG:
             ers_times_list,
         )
 
-
     def analyze_whole_erds(
         self,
         eeg_filename: str,
@@ -121,8 +122,8 @@ class AnalyzeEEG:
         result_dir: str,
     ):
         # Check result directory
-        if not os.path.isdir(os.path.join(os.getcwd(), result_dir)):
-            os.mkdir(os.path.join(os.getcwd(), result_dir))
+        if not os.path.isdir(result_dir):
+            os.makedirs(result_dir)
 
         # Read eeg and events
         eeg, eeg_times = self.preprocess_eeg.read_eeg(eeg_filename)
@@ -175,3 +176,23 @@ class AnalyzeEEG:
             erds_whole_avg_evoked_list,
             erds_whole_times_list,
         )
+
+    def analyze_ssvep(
+        self,
+        fft_filename: str,
+        frequencies: List,
+        freq_range: float,
+        result_dir: str,
+    ):
+        # Check result directory
+        if not os.path.isdir(result_dir):
+            os.makedirs(result_dir)
+
+        # Read eeg and events
+        fft = pd.read_csv(fft_filename)
+        avg_values = {f"{float(frequency):.2f}Hz": fft.loc[:, f"{float(frequency-freq_range):.2f}Hz":f"{float(frequency+freq_range):.2f}Hz"].mean(axis=1) for frequency in frequencies
+        }
+        avg_df = pd.DataFrame(avg_values)
+        avg_df["Time"] = pd.to_datetime(fft["Time"])
+        avg_df.set_index("Time", inplace=True)
+        return avg_df
