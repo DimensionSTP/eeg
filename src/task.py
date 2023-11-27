@@ -91,7 +91,7 @@ def combination_task(
                         num_image + 1,
                     ]
                 )
-    time.sleep(30)
+    time.sleep(10)
     pygame.quit()
 
 
@@ -179,7 +179,7 @@ def celebrity_task(
                         num_image + 1,
                     ]
                 )
-    time.sleep(30)
+    time.sleep(10)
     pygame.quit()
 
 
