@@ -20,6 +20,7 @@ def ssvep_quiz(
     freq_range: float,
     correct_num: int,
     result_dir: str,
+    early_cut: int = 22,
 ):
     today = str(datetime.now().date())
     if not os.path.exists(f"./data/{today}"):
@@ -57,26 +58,35 @@ def ssvep_quiz(
         fft_filename=fp1_file_path,
         frequencies=frequencies,
         freq_range=freq_range,
-        result_dir=result_dir
+        result_dir=result_dir,
+        early_cut=early_cut,
     )
     avg_fp2_df = analyze_eeg.analyze_ssvep(
         fft_filename=fp2_file_path,
         frequencies=frequencies,
         freq_range=freq_range,
-        result_dir=result_dir
+        result_dir=result_dir,
+        early_cut=early_cut,
     )
     
     plot_ssvep(
         df=avg_fp1_df,
-        save_path=f"{result_dir}/fp1.png"
+        save_path=f"{result_dir}/fp1.png",
     )
     plot_ssvep(
         df=avg_fp2_df,
-        save_path=f"{result_dir}/fp2.png"
+        save_path=f"{result_dir}/fp2.png",
     )
     
     recommend_answer_ssvep(
-        fp1_df=avg_fp1_df, fp2_df=avg_fp2_df, screen_width=screen_width, screen_height=screen_height, frequencies=frequencies, image_folder=image_folder, correct_num=correct_num, result_dir=result_dir
+        fp1_df=avg_fp1_df, 
+        fp2_df=avg_fp2_df, 
+        screen_width=screen_width, 
+        screen_height=screen_height, 
+        frequencies=frequencies, 
+        image_folder=image_folder, 
+        correct_num=correct_num, 
+        result_dir=result_dir,
     )
 
 
@@ -152,13 +162,19 @@ if __name__ == "__main__":
         "--result_dir",
         type=str,
         default="./plot",
-        help="Set a EEG, ERDS plots saving path",
+        help="Set a SSVEP plots saving path",
     )
     parser.add_argument(
         "--result_dir_num",
         type=int,
         default=0,
-        help="Set a EEG, ERDS plots detailed saving path",
+        help="Set a SSVEP plots detailed saving path",
+    )
+    parser.add_argument(
+        "--early_cut",
+        type=int,
+        default=22,
+        help="Set an early cutting point of SSVEP",
     )
     args = parser.parse_args()
 
@@ -173,4 +189,5 @@ if __name__ == "__main__":
         freq_range=args.freq_range,
         correct_num=args.correct_num,
         result_dir=f"{args.result_dir}/quiz/{args.result_dir_num}",
+        early_cut=args.early_cut,
     )

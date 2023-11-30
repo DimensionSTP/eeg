@@ -17,6 +17,10 @@ class AnalyzeEEG:
         event_filename: str,
         result_dir: str,
         num_types: int,
+        lowcut: float = 1.0,
+        highcut: float = 30.0,
+        tmin: float = -0.2,
+        tmax: float = 1.0,
     ):
         # Check result directory
         if not os.path.isdir(result_dir):
@@ -35,10 +39,7 @@ class AnalyzeEEG:
         )
 
         # Apply filter (1-30 Hz)
-        self.preprocess_eeg.filter(eeg, lowcut=1, highcut=30)
-
-        # Analysis ERP
-        tmin, tmax = -0.2, 1.0
+        self.preprocess_eeg.filter(eeg, lowcut=lowcut, highcut=highcut)
 
         avg_evoked_list = []
         times_list = []
@@ -56,6 +57,12 @@ class AnalyzeEEG:
         event_filename: str,
         result_dir: str,
         num_types: int,
+        erd_lowcut: float = 8.0,
+        erd_highcut: float = 11.0,
+        ers_lowcut: float = 26.0,
+        ers_highcut: float = 30.0,
+        tmin: float = -4.0,
+        tmax: float = 4.0,
     ):
         # Check result directory
         if not os.path.isdir(result_dir):
@@ -75,8 +82,8 @@ class AnalyzeEEG:
         # Apply filter
         erd_eeg = copy.deepcopy(eeg)
         ers_eeg = copy.deepcopy(eeg)
-        self.preprocess_eeg.filter(erd_eeg, lowcut=8, highcut=11)  # ERD (Alpha)
-        self.preprocess_eeg.filter(ers_eeg, lowcut=26, highcut=30)  # ERS (Beta)
+        self.preprocess_eeg.filter(erd_eeg, lowcut=erd_lowcut, highcut=erd_highcut)  # ERD (Alpha)
+        self.preprocess_eeg.filter(ers_eeg, lowcut=ers_lowcut, highcut=ers_highcut)  # ERS (Beta)
 
         # Squaring
         erd_eeg = self.preprocess_eeg.square(erd_eeg)
@@ -85,9 +92,6 @@ class AnalyzeEEG:
         # Smoothing
         erd_eeg = self.preprocess_eeg.moving_average(erd_eeg)
         ers_eeg = self.preprocess_eeg.moving_average(ers_eeg)
-
-        # Analysis evoked potential
-        tmin, tmax = -4.0, 4.0
 
         erd_avg_evoked_list = []
         erd_times_list = []
@@ -120,6 +124,12 @@ class AnalyzeEEG:
         eeg_filename: str,
         event_filename: str,
         result_dir: str,
+        erds_lowcut: float = 8.0,
+        erds_highcut: float = 12.0,
+        erds_whole_lowcut: float = 8.0,
+        erds_whole_highcut: float = 30.0,
+        tmin: float = -4.0,
+        tmax: float = 4.0,
     ):
         # Check result directory
         if not os.path.isdir(result_dir):
@@ -139,8 +149,8 @@ class AnalyzeEEG:
         # Apply filter
         erds_eeg = copy.deepcopy(eeg)
         erds_whole_eeg = copy.deepcopy(eeg)
-        self.preprocess_eeg.filter(erds_eeg, lowcut=8, highcut=12)  # ERD (Alpha)
-        self.preprocess_eeg.filter(erds_whole_eeg, lowcut=8, highcut=30)  # ERS (Beta)
+        self.preprocess_eeg.filter(erds_eeg, lowcut=erds_lowcut, highcut=erds_highcut)  # ERDS (Mu)
+        self.preprocess_eeg.filter(erds_whole_eeg, lowcut=erds_whole_lowcut, highcut=erds_whole_highcut)  # ERDS_whole
 
         # Squaring
         erds_eeg = self.preprocess_eeg.square(erds_eeg)
@@ -149,9 +159,6 @@ class AnalyzeEEG:
         # Smoothing
         erds_eeg = self.preprocess_eeg.moving_average(erds_eeg)
         erds_whole_eeg = self.preprocess_eeg.moving_average(erds_whole_eeg)
-
-        # Analysis evoked potential
-        tmin, tmax = -4.0, 4.0
 
         erds_avg_evoked_list = []
         erds_times_list = []
@@ -183,6 +190,7 @@ class AnalyzeEEG:
         frequencies: List,
         freq_range: float,
         result_dir: str,
+        early_cut: int = 22,
     ):
         # Check result directory
         if not os.path.isdir(result_dir):
@@ -190,7 +198,7 @@ class AnalyzeEEG:
 
         # Read eeg and events
         fft = pd.read_csv(fft_filename)
-        fft = fft.iloc[22:, :]
+        fft = fft.iloc[early_cut:, :]
         avg_values = {f"{float(frequency):.2f}Hz": fft.loc[:, f"{float(frequency-freq_range):.2f}Hz":f"{float(frequency+freq_range):.2f}Hz"].mean(axis=1) for frequency in frequencies
         }
         avg_df = pd.DataFrame(avg_values)

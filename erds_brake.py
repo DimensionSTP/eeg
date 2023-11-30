@@ -22,6 +22,12 @@ def erds_brake(
     num_images: int,
     event_save_path: str,
     result_dir: str,
+    erd_lowcut: float = 8.0,
+    erd_highcut: float = 11.0,
+    ers_lowcut: float = 26.0,
+    ers_highcut: float = 30.0,
+    tmin: float = -4.0,
+    tmax: float = 4.0,
 ):
     today = str(datetime.now().date())
     if not os.path.exists(f"./data/{today}"):
@@ -64,6 +70,12 @@ def erds_brake(
         event_filename=event_file,
         result_dir=result_dir,
         num_types=num_images,
+        erd_lowcut=erd_lowcut,
+        erd_highcut=erd_highcut,
+        ers_lowcut=ers_lowcut,
+        ers_highcut=ers_highcut,
+        tmin=tmin,
+        tmax=tmax,
     )
 
     plot_eeg = PlotEEG(
@@ -182,6 +194,42 @@ if __name__ == "__main__":
         default=0,
         help="Set a EEG, ERDS plots detailed saving path",
     )
+    parser.add_argument(
+        "--erd_lowcut",
+        type=float,
+        default=8.0,
+        help="Set butter filter lowcut to get ERD",
+    )
+    parser.add_argument(
+        "--erd_highcut",
+        type=float,
+        default=11.0,
+        help="Set butter filter highcut to get ERD",
+    )
+    parser.add_argument(
+        "--ers_lowcut",
+        type=float,
+        default=26.0,
+        help="Set butter filter lowcut to get ERS",
+    )
+    parser.add_argument(
+        "--ers_highcut",
+        type=float,
+        default=30.0,
+        help="Set butter filter highcut to get ERS",
+    )
+    parser.add_argument(
+        "--tmin",
+        type=float,
+        default=-4.0,
+        help="Set epoch tmin to get ERDS",
+    )
+    parser.add_argument(
+        "--tmax",
+        type=float,
+        default=4.0,
+        help="Set epoch tmax to get ERDS",
+    )
     args = parser.parse_args()
 
     erds_brake(
@@ -197,4 +245,10 @@ if __name__ == "__main__":
         num_images=args.num_images,
         event_save_path=f"{args.event_save_path}",
         result_dir=f"{args.result_dir}/brake/{args.result_dir_num}",
+        erd_lowcut=args.erd_lowcut,
+        erd_highcut=args.erd_highcut,
+        ers_lowcut=args.ers_lowcut,
+        ers_highcut=args.ers_highcut,
+        tmin=args.tmin,
+        tmax=args.tmax,
     )

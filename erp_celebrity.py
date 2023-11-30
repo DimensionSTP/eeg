@@ -23,6 +23,10 @@ def erp_celebrity(
     num_images: int,
     event_save_path: str,
     result_dir: str,
+    lowcut: float = 1.0,
+    highcut: float = 30.0,
+    tmin: float = -0.2,
+    tmax: float = 1.0,
 ):
     today = str(datetime.now().date())
     if not os.path.exists(f"./data/{today}"):
@@ -65,6 +69,10 @@ def erp_celebrity(
         event_filename=event_file,
         result_dir=result_dir,
         num_types=num_images,
+        lowcut=lowcut,
+        highcut=highcut,
+        tmin=tmin,
+        tmax=tmax,
     )
 
     plot_eeg = PlotEEG(
@@ -192,6 +200,30 @@ if __name__ == "__main__":
         default=0,
         help="Set a EEG, ERP plots detailed saving path",
     )
+    parser.add_argument(
+        "--lowcut",
+        type=float,
+        default=1.0,
+        help="Set butter filter lowcut to get ERP",
+    )
+    parser.add_argument(
+        "--highcut",
+        type=float,
+        default=30.0,
+        help="Set butter filter highcut to get ERP",
+    )
+    parser.add_argument(
+        "--tmin",
+        type=float,
+        default=-0.2,
+        help="Set epoch tmin to get ERP",
+    )
+    parser.add_argument(
+        "--tmax",
+        type=float,
+        default=1.0,
+        help="Set epoch tmax to get ERP",
+    )
     args = parser.parse_args()
 
     erp_celebrity(
@@ -207,4 +239,8 @@ if __name__ == "__main__":
         num_images=args.num_images,
         event_save_path=f"{args.event_save_path}",
         result_dir=f"{args.result_dir}/{args.sex}/{args.result_dir_num}",
+        lowcut=args.lowcut,
+        highcut=args.highcut,
+        tmin=args.tmin,
+        tmax=args.tmax,
     )

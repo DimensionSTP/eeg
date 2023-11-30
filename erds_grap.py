@@ -23,6 +23,12 @@ def erds_grap(
     event_save_path: str,
     result_dir: str,
     value_dir: str,
+    erds_lowcut: float = 8.0,
+    erds_highcut: float = 12.0,
+    erds_whole_lowcut: float = 8.0,
+    erds_whole_highcut: float = 30.0,
+    tmin: float = -4.0,
+    tmax: float = 4.0,
 ):
     today = str(datetime.now().date())
     if not os.path.exists(f"./data/{today}"):
@@ -64,6 +70,12 @@ def erds_grap(
         eeg_filename=data_file_path,
         event_filename=event_file,
         result_dir=result_dir,
+        erds_lowcut=erds_lowcut,
+        erds_highcut=erds_highcut,
+        erds_whole_lowcut=erds_whole_lowcut,
+        erds_whole_highcut=erds_whole_highcut,
+        tmin=tmin,
+        tmax=tmax,
     )
 
     for channel in range(len(channels)):
@@ -211,6 +223,42 @@ if __name__ == "__main__":
         default=0,
         help="Set a EEG, ERDS plots and values detailed saving path",
     )
+    parser.add_argument(
+        "--erds_lowcut",
+        type=float,
+        default=8.0,
+        help="Set butter filter lowcut to get ERDS",
+    )
+    parser.add_argument(
+        "--erds_highcut",
+        type=float,
+        default=12.0,
+        help="Set butter filter highcut to get ERDS",
+    )
+    parser.add_argument(
+        "--erds_whole_lowcut",
+        type=float,
+        default=8.0,
+        help="Set butter filter lowcut to get whole ERDS",
+    )
+    parser.add_argument(
+        "--erds_whole_highcut",
+        type=float,
+        default=30.0,
+        help="Set butter filter highcut to get whole ERDS",
+    )
+    parser.add_argument(
+        "--tmin",
+        type=float,
+        default=-4.0,
+        help="Set epoch tmin to get ERDS",
+    )
+    parser.add_argument(
+        "--tmax",
+        type=float,
+        default=4.0,
+        help="Set epoch tmax to get ERDS",
+    )
     args = parser.parse_args()
 
     erds_grap(
@@ -227,4 +275,10 @@ if __name__ == "__main__":
         event_save_path=f"{args.event_save_path}",
         result_dir=f"{args.result_dir}/grap/{args.dir_num}",
         value_dir=f"{args.value_dir}/grap/{args.dir_num}",
+        erds_lowcut=args.erds_lowcut,
+        erds_highcut=args.erds_highcut,
+        erds_whole_lowcut=args.erds_whole_lowcut,
+        erds_whole_highcut=args.erds_whole_highcut,
+        tmin=args.tmin,
+        tmax=args.tmax,
     )
