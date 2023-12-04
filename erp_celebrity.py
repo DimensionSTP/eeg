@@ -229,9 +229,9 @@ if __name__ == "__main__":
     erp_celebrity(
         screen_width=args.screen_width,
         screen_height=args.screen_height,
-        isi=args.isi,
         fs=args.fs,
         channels=args.channels,
+        isi=args.isi,
         background_path=f"{args.image_path}/backgrounds/B0.jpg",
         image_folder=f"{args.image_path}/{args.sex}",
         sex=f"{args.sex}",

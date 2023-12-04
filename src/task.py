@@ -445,3 +445,106 @@ def quiz_task(
     # Pygame 종료
     pygame.quit()
     time.sleep(10)
+
+
+def selection_task(
+    screen_width: int,
+    screen_height: int,
+    isi: int,
+    image_folder: str,
+    frequencies: List,
+    experiment_duration: int,
+    event_save_path: str,
+):
+    # Pygame 초기화
+    pygame.init()
+
+    # 화면 크기 및 설정
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    pygame.display.set_caption("Selection Experiment")
+    current_time = datetime.datetime.now()
+    hour = str(current_time).split(" ")[1].split(":")[0]
+    min = str(current_time).split(" ")[1].split(":")[1]
+    sec = str(current_time).split(" ")[1].split(":")[2]
+
+    filename = f"{event_save_path}/select_event_{hour}.{min}.{sec}.csv"
+    with open(filename, mode="w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow(["ISI", "RT", "Stimulus"])
+
+    # 이미지 로딩
+    images = [pygame.image.load(f"{image_folder}/{i}.png") for i in range(1, 9)]
+
+    # 이미지 위치 및 크기 계산
+    image_width, image_height = images[0].get_size()
+    image_positions = [
+        ((screen_width / 4) - (image_width / 2), (screen_height / 4) - (image_height / 2)),  # 상단 왼쪽
+        ((screen_width * 3 / 4) - (image_width / 2), (screen_height / 4) - (image_height / 2)),  # 상단 오른쪽
+        ((screen_width / 4) - (image_width / 2), (screen_height * 3 / 4) - (image_height / 2)),  # 하단 왼쪽
+        ((screen_width * 3 / 4) - (image_width / 2), (screen_height * 3 / 4) - (image_height / 2))  # 하단 오른쪽
+    ]
+
+    # 주파수에 따른 깜박임 주기 계산 (1초 동안 깜박이는 시간)
+    flash_intervals = [1 / f for f in frequencies]  # 주파수의 반주기
+
+    # 타이머 및 상태 초기화
+    timers = [0] * len(frequencies)
+    flash_states = [False] * len(frequencies)  # 깜박임 상태 (True: 깜박임, False: 검은 화면)
+
+    # 실험 시작 시간
+    experiment_start_time = time.time()
+
+    # 메인 루프
+    running = True
+    while running:
+        current_time = time.time()
+
+        # 실험 시간이 지나면 종료
+        if current_time - experiment_start_time >= experiment_duration:
+            running = False
+
+        # 화면 지우기
+        screen.fill((0, 0, 0))
+        
+
+        # 각 화면별 깜박임 및 표시
+        for i in range(4):
+            if current_time - timers[i] >= isi / 1000.0:
+                # 1초 후 깜박임 상태 전환
+                flash_states[i] = not flash_states[i]
+                timers[i] = current_time
+
+            if flash_states[i]:
+                # 깜박임 상태일 때만 이미지 표시
+                time_since_flash_start = current_time - timers[i]
+                if time_since_flash_start % flash_intervals[i] < flash_intervals[i] / 2:
+                    rect = images[i * 2].get_rect()
+                    rect.topleft = image_positions[i]
+                    screen.blit(images[i * 2], rect)
+
+        # 중앙 고정점 그리기 (예: 하얀색 십자가)
+        cross_center = (screen_width / 2, screen_height / 2)
+        pygame.draw.line(screen, (255, 255, 255), (cross_center[0] - 10, cross_center[1]), (cross_center[0] + 10, cross_center[1]), 2)
+        pygame.draw.line(screen, (255, 255, 255), (cross_center[0], cross_center[1] - 10), (cross_center[0], cross_center[1] + 10), 2)
+
+        pygame.display.flip()
+
+        # CSV 파일에 결과 기록
+        with open(filename, mode="a", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(
+                [
+                    isi,
+                    isi,
+                    1,
+                ]
+            )
+            
+        # 이벤트 처리
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+    # Pygame 종료
+    time.sleep(10)
+    pygame.quit()

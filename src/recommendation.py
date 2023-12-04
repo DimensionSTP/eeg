@@ -5,7 +5,7 @@ import pandas as pd
 
 
 def recommend_combination(
-    avg_evoked_list: List, times_list: List, channels: List, clothes_type: str
+    avg_evoked_list: List, times_list: List, channels: List, image_folder: str, clothes_type: str,
 ):
     max_values_per_channels = []
     for channel_idx in range(len(channels)):
@@ -55,13 +55,13 @@ def recommend_combination(
     if clothes_type == "bottoms":
         for index in top_indices:
             print(f"당신이 끌리는 하의 조합은 {index}번 하의입니다.")
-            image_filename = f"./images/bottoms/B{index}.jpg"
+            image_filename = f"{image_folder}/B{index}.jpg"
             image = Image.open(image_filename)
             image.show()
     elif clothes_type == "shoes":
         for index in top_indices:
             print(f"당신이 끌리는 신발의 조합은 {index}번 신발입니다.")
-            image_filename = f"./images/shoes/S{index}.jpg"
+            image_filename = f"{image_folder}/S{index}.jpg"
             image = Image.open(image_filename)
             image.show()
     else:
@@ -223,7 +223,7 @@ def recommend_celebrity(
 
 
 def recommend_answer_ssvep(
-    fp1_df:pd.DataFrame, fp2_df:pd.DataFrame, screen_width: int, screen_height: int, frequencies: List, image_folder: str, correct_num: int, result_dir: str
+    fp1_df:pd.DataFrame, fp2_df:pd.DataFrame, screen_width: int, screen_height: int, frequencies: List, image_folder: str, correct_num: int, result_dir: str,
 ):
     combined_df = pd.concat([fp1_df, fp2_df], axis=1)
     max_values = combined_df.max()
@@ -252,3 +252,51 @@ def recommend_answer_ssvep(
             # 변경된 이미지 저장
             image.save(f"{result_dir}/answer.png")
             image.show(f"{result_dir}/answer.png")
+
+
+def recommend_selection(
+    avg_evoked_list: List, times_list: List, channels: List, image_folder: str,
+):
+    max_values_per_channels = []
+    for channel_idx in range(len(channels)):
+        max_values = []
+        for time in range(len(times_list)):
+            selected_indices = [
+                index
+                for index, value in enumerate(times_list[time])
+                if 0.1 <= value <= 0.5
+            ]
+            start_index = selected_indices[0]
+            end_index = selected_indices[-1]
+
+            max_value = max(
+                avg_evoked_list[time][channel_idx][start_index : end_index + 1]
+            )
+            max_values.append(max_value)
+        max_values_per_channels.append(max_values)
+
+    indices_of_largest_values_per_channels = []
+    for channel in range(len(max_values_per_channels)):
+        indices_of_largest_values = sorted(
+            range(len(max_values_per_channels[channel])),
+            key=lambda i: max_values_per_channels[channel][i],
+            reverse=True,
+        )[:3]
+        largest_values = [
+            max_values_per_channels[channel][i] for i in indices_of_largest_values
+        ]
+        top_values_and_indices = [
+            (value, index)
+            for value, index in zip(largest_values, indices_of_largest_values)
+        ]
+        indices_of_largest_values_per_channels.append(top_values_and_indices)
+
+    top_values_and_indices = sum(indices_of_largest_values_per_channels, [])
+    sorted_top_values_and_indices = sorted(
+        top_values_and_indices, key=lambda i: i[0], reverse=True
+    )
+    top_index = sorted_top_values_and_indices[0][1]
+    print(f"your selection is {top_index*2+1}")
+    image_filename = f"{image_folder}/{top_index*2+1}.png"
+    image = Image.open(image_filename)
+    image.show()

@@ -106,6 +106,7 @@ def erp_combination(
         avg_evoked_list=avg_evoked_list,
         times_list=times_list,
         channels=channels,
+        image_folder=image_folder,
         clothes_type=clothes_type,
     )
 
@@ -231,9 +232,9 @@ if __name__ == "__main__":
     erp_combination(
         screen_width=args.screen_width,
         screen_height=args.screen_height,
-        isi=args.isi,
         fs=args.fs,
         channels=args.channels,
+        isi=args.isi,
         top_image_path=f"{args.image_path}/tops/T{args.tops_order}.jpg",
         image_folder=f"{args.image_path}/{args.clothes_type}",
         clothes_type=f"{args.clothes_type}",
