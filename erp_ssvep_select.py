@@ -7,7 +7,6 @@ import pandas as pd
 from src.task import selection_task
 from src.analysis import AnalyzeEEG
 from src.plot import PlotEEG, plot_ssvep
-import pdb
 from src.recommendation import recommend_selection
 
 
@@ -26,6 +25,7 @@ def erp_ssvep_select(
     tmin: float = 0.0,
     tmax: float = 1.0,
     early_cut: int = 0,
+    scaled: bool = True,
 ):
     today = str(datetime.now().date())
     if not os.path.exists(f"./data/{today}"):
@@ -115,6 +115,7 @@ def erp_ssvep_select(
         freq_range=freq_range,
         result_dir=result_dir,
         early_cut=early_cut,
+        scaled=scaled,
     )
     avg_fp2_df = analyze_eeg.analyze_ssvep(
         fft_filename=fp2_file_path,
@@ -122,6 +123,7 @@ def erp_ssvep_select(
         freq_range=freq_range,
         result_dir=result_dir,
         early_cut=early_cut,
+        scaled=scaled,
     )
     
     plot_ssvep(
@@ -245,6 +247,12 @@ if __name__ == "__main__":
         default=0,
         help="Set an early cutting point of SSVEP",
     )
+    parser.add_argument(
+        "--scaled",
+        type=bool,
+        default=True,
+        help="Set a scaling option of SSVEP",
+    )
     args = parser.parse_args()
 
     erp_ssvep_select(
@@ -261,5 +269,6 @@ if __name__ == "__main__":
         freq_range=args.freq_range,
         tmin=args.tmin,
         tmax=args.tmax,
-        early_cut=args.early_cut
+        early_cut=args.early_cut,
+        scaled=args.scaled,
     )

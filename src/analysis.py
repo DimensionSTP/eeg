@@ -3,6 +3,7 @@ import copy
 from typing import List
 
 import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
 
 from .preprocess import PreprocessEEG
 
@@ -230,6 +231,7 @@ class AnalyzeEEG:
         freq_range: float,
         result_dir: str,
         early_cut: int = 22,
+        scaled: bool = True
     ):
         # Check result directory
         if not os.path.isdir(result_dir):
@@ -241,6 +243,17 @@ class AnalyzeEEG:
         avg_values = {f"{float(frequency):.2f}Hz": fft.loc[:, f"{float(frequency-freq_range):.2f}Hz":f"{float(frequency+freq_range):.2f}Hz"].mean(axis=1) for frequency in frequencies
         }
         avg_df = pd.DataFrame(avg_values)
-        avg_df["Time"] = pd.to_datetime(fft["Time"])
-        avg_df.set_index("Time", inplace=True)
-        return avg_df
+
+        if scaled:
+            scaler = MinMaxScaler(feature_range=(0,1))
+            scaler.fit(avg_df)
+            scaled_avg_values = scaler.transform(avg_df)
+
+            scaled_avg_df = pd.DataFrame(scaled_avg_values)
+            scaled_avg_df["Time"] = pd.to_datetime(fft["Time"])
+            scaled_avg_df.set_index("Time", inplace=True)
+            return scaled_avg_df
+        else:
+            avg_df["Time"] = pd.to_datetime(fft["Time"])
+            avg_df.set_index("Time", inplace=True)
+            return avg_df
