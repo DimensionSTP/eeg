@@ -25,7 +25,7 @@ def erp_ssvep_select(
     tmin: float = 0.0,
     tmax: float = 1.0,
     early_cut: int = 0,
-    scaled: bool = True,
+    scale: str = "min_max",
 ):
     today = str(datetime.now().date())
     if not os.path.exists(f"./data/{today}"):
@@ -115,7 +115,7 @@ def erp_ssvep_select(
         freq_range=freq_range,
         result_dir=result_dir,
         early_cut=early_cut,
-        scaled=scaled,
+        scale=scale,
     )
     avg_fp2_df = analyze_eeg.analyze_ssvep(
         fft_filename=fp2_file_path,
@@ -123,7 +123,7 @@ def erp_ssvep_select(
         freq_range=freq_range,
         result_dir=result_dir,
         early_cut=early_cut,
-        scaled=scaled,
+        scale=scale,
     )
     
     plot_ssvep(
@@ -248,9 +248,9 @@ if __name__ == "__main__":
         help="Set an early cutting point of SSVEP",
     )
     parser.add_argument(
-        "--scaled",
-        type=bool,
-        default=True,
+        "--scale",
+        type=str,
+        default="min_max",
         help="Set a scaling option of SSVEP",
     )
     args = parser.parse_args()
@@ -270,5 +270,5 @@ if __name__ == "__main__":
         tmin=args.tmin,
         tmax=args.tmax,
         early_cut=args.early_cut,
-        scaled=args.scaled,
+        scale=args.scale,
     )
