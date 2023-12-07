@@ -3,7 +3,7 @@ import copy
 from typing import List
 
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 from .preprocess import PreprocessEEG
 
@@ -231,7 +231,7 @@ class AnalyzeEEG:
         freq_range: float,
         result_dir: str,
         early_cut: int = 22,
-        scaled: bool = True
+        scale: str = "min_max"
     ):
         # Check result directory
         if not os.path.isdir(result_dir):
@@ -244,16 +244,21 @@ class AnalyzeEEG:
         }
         avg_df = pd.DataFrame(avg_values)
 
-        if scaled:
+        if scale == "min_max":
             scaler = MinMaxScaler(feature_range=(0,1))
-            scaler.fit(avg_df)
-            scaled_avg_values = scaler.transform(avg_df)
-
-            scaled_avg_df = pd.DataFrame(scaled_avg_values)
+            scaled_avg_df = pd.DataFrame(scaler.fit_transform(avg_df), columns=avg_df.columns)
             scaled_avg_df["Time"] = pd.to_datetime(fft["Time"])
             scaled_avg_df.set_index("Time", inplace=True)
             return scaled_avg_df
-        else:
+        elif scale == "standard":
+            scaler = StandardScaler()
+            scaled_avg_df = pd.DataFrame(scaler.fit_transform(avg_df), columns=avg_df.columns)
+            scaled_avg_df["Time"] = pd.to_datetime(fft["Time"])
+            scaled_avg_df.set_index("Time", inplace=True)
+            return scaled_avg_df
+        elif scale == "original":
             avg_df["Time"] = pd.to_datetime(fft["Time"])
             avg_df.set_index("Time", inplace=True)
             return avg_df
+        else:
+            raise ValueError("Invalid scale type")

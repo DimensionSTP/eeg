@@ -21,7 +21,7 @@ def ssvep_quiz(
     correct_num: int,
     result_dir: str,
     early_cut: int = 22,
-    scaled: bool = True,
+    scale: str = "min_max",
 ):
     today = str(datetime.now().date())
     if not os.path.exists(f"./data/{today}"):
@@ -61,7 +61,7 @@ def ssvep_quiz(
         freq_range=freq_range,
         result_dir=result_dir,
         early_cut=early_cut,
-        scaled=scaled,
+        scale=scale,
     )
     avg_fp2_df = analyze_eeg.analyze_ssvep(
         fft_filename=fp2_file_path,
@@ -69,7 +69,7 @@ def ssvep_quiz(
         freq_range=freq_range,
         result_dir=result_dir,
         early_cut=early_cut,
-        scaled=scaled,
+        scale=scale,
     )
     
     plot_ssvep(
@@ -180,9 +180,9 @@ if __name__ == "__main__":
         help="Set an early cutting point of SSVEP",
     )
     parser.add_argument(
-        "--scaled",
-        type=bool,
-        default=True,
+        "--scale",
+        type=str,
+        default="min_max",
         help="Set a scaling option of SSVEP",
     )
     args = parser.parse_args()
@@ -199,5 +199,5 @@ if __name__ == "__main__":
         correct_num=args.correct_num,
         result_dir=f"{args.result_dir}/quiz/{args.result_dir_num}",
         early_cut=args.early_cut,
-        scaled=args.scaled,
+        scale=args.scale,
     )
