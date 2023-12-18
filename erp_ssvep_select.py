@@ -90,8 +90,8 @@ def erp_ssvep_select(
             tmax=tmax,
         )
 
-        times_list = [times[1:] for times in times_list]
-        avg_evoked_list_frequencies.append(avg_evoked_list[0])
+        # times_list = [times[1:] for times in times_list]
+        # avg_evoked_list_frequencies.append(avg_evoked_list[0])
 
         plot_eeg = PlotEEG(
             channels=channels,
@@ -196,13 +196,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--frequencies",
         type=parse_list,
-        default="[27.0, 13.0, 19.0, 23.0]",
+        default="[9.0, 7.0, 5.0, 11.0]",
         help="Get frequencies to use in the task",
     )
     parser.add_argument(
         "--experiment_duration",
         type=int,
-        default=20,
+        default=60,
         help="Set experiment_duration to use in the task",
     )
     parser.add_argument(
@@ -226,13 +226,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--freq_range",
         type=float,
-        default=5.0,
+        default=4.0,
         help="Set freq_range to get ERP",
     )
     parser.add_argument(
         "--tmin",
         type=float,
-        default=0.0,
+        default=-0.2,
         help="Set epoch tmin to get ERP",
     )
     parser.add_argument(
