@@ -240,22 +240,75 @@ class AnalyzeEEG:
         # Read eeg and events
         fft = pd.read_csv(fft_filename)
         fft = fft.iloc[early_cut:, :]
-        avg_values = {f"{float(frequency):.2f}Hz": fft.loc[:, f"{float(frequency-freq_range):.2f}Hz":f"{float(frequency+freq_range):.2f}Hz"].mean(axis=1) for frequency in frequencies
-        }
-        avg_df = pd.DataFrame(avg_values)
+        
+        # avg_values = {f"{float(frequency):.2f}Hz": fft.loc[:, f"{float(frequency-freq_range):.2f}Hz":f"{float(frequency+freq_range):.2f}Hz"].mean(axis=1) for frequency in frequencies
+        # }
+        # avg_df = pd.DataFrame(avg_values)
 
+        # if scale == "min_max":
+        #     scaler = MinMaxScaler(feature_range=(0,1))
+        #     scaled_avg_df = pd.DataFrame(scaler.fit_transform(avg_df), columns=avg_df.columns)
+        #     scaled_avg_df["Time"] = pd.to_datetime(fft["Time"])
+        #     scaled_avg_df.set_index("Time", inplace=True)
+        #     return scaled_avg_df
+        # elif scale == "standard":
+        #     scaler = StandardScaler()
+        #     scaled_avg_df = pd.DataFrame(scaler.fit_transform(avg_df), columns=avg_df.columns)
+        #     scaled_avg_df["Time"] = pd.to_datetime(fft["Time"])
+        #     scaled_avg_df.set_index("Time", inplace=True)
+        #     return scaled_avg_df
+        # elif scale == "original":
+        #     avg_df["Time"] = pd.to_datetime(fft["Time"])
+        #     avg_df.set_index("Time", inplace=True)
+        #     return avg_df
+        # else:
+        #     raise ValueError("Invalid scale type")
+
+        # harmonic_frequencies = []
+        # for i in range(1, 4):
+        #     harmonic_frequencies += [frequency * i for frequency in frequencies]
+        
+        # avg_values = {f"{float(frequency):.2f}Hz": fft.loc[:, f"{float(frequency-freq_range):.2f}Hz":f"{float(frequency+freq_range):.2f}Hz"].mean(axis=1) for frequency in harmonic_frequencies
+        # }
+        # avg_df = pd.DataFrame(avg_values)
+        
+        # avg_values = {f"{float(frequency):.2f}Hz": fft.loc[:, f"{float(frequency-freq_range):.2f}Hz":f"{float(frequency+freq_range):.2f}Hz"].mean(axis=1) for frequency in frequencies
+        # }
+        # avg_df = pd.DataFrame(avg_values)
+
+        avg_dfs = []
+        for i in range(1, 4):
+            avg_values = {f"{float(frequency):.2f}Hz": fft.loc[:, f"{float(frequency*i-freq_range):.2f}Hz":f"{float(frequency*i+freq_range):.2f}Hz"].mean(axis=1) for frequency in frequencies
+            }
+            # avg_values = {}
+            # avg_values_0 = {f"{float(frequencies[0]):.2f}Hz": fft.loc[:, f"{float(frequencies[0]*i-freq_range):.2f}Hz":f"{float(frequencies[0]*i+freq_range):.2f}Hz"].mean(axis=1)}
+            # avg_values_1 = {f"{float(frequencies[1]):.2f}Hz": fft.loc[:, f"{float(frequencies[1]*i+1-freq_range):.2f}Hz":f"{float(frequencies[1]*i+1+freq_range):.2f}Hz"].mean(axis=1)}
+            # avg_values_2 = {f"{float(frequencies[2]):.2f}Hz": fft.loc[:, f"{float(frequencies[2]*i+1-freq_range):.2f}Hz":f"{float(frequencies[2]*i+1+freq_range):.2f}Hz"].mean(axis=1)}
+            # avg_values_3 = {f"{float(frequencies[3]):.2f}Hz": fft.loc[:, f"{float(frequencies[3]*i-freq_range):.2f}Hz":f"{float(frequencies[3]*i+freq_range):.2f}Hz"].mean(axis=1)}
+            # avg_values.update(avg_values_0)
+            # avg_values.update(avg_values_1)
+            # avg_values.update(avg_values_2)
+            # avg_values.update(avg_values_3)
+            avg_df = pd.DataFrame(avg_values)
+            avg_dfs.append(avg_df)
+            
         if scale == "min_max":
-            scaler = MinMaxScaler(feature_range=(0,1))
-            scaled_avg_df = pd.DataFrame(scaler.fit_transform(avg_df), columns=avg_df.columns)
+            scaled_avg_values = 0
+            for avg_df in avg_dfs:
+                scaler = MinMaxScaler(feature_range=(0,1))
+                scaled_avg_values += scaler.fit_transform(avg_df)
+            scaled_avg_df = pd.DataFrame(scaled_avg_values, columns=avg_dfs[0].columns)
             scaled_avg_df["Time"] = pd.to_datetime(fft["Time"])
             scaled_avg_df.set_index("Time", inplace=True)
             return scaled_avg_df
         elif scale == "standard":
-            scaler = StandardScaler()
-            scaled_avg_df = pd.DataFrame(scaler.fit_transform(avg_df), columns=avg_df.columns)
+            scaled_avg_values = 0
+            for avg_df in avg_dfs:
+                scaler = StandardScaler()
+                scaled_avg_values += scaler.fit_transform(avg_df)
+            scaled_avg_df = pd.DataFrame(scaled_avg_values, columns=avg_dfs[0].columns)
             scaled_avg_df["Time"] = pd.to_datetime(fft["Time"])
             scaled_avg_df.set_index("Time", inplace=True)
-            return scaled_avg_df
         elif scale == "original":
             avg_df["Time"] = pd.to_datetime(fft["Time"])
             avg_df.set_index("Time", inplace=True)
