@@ -77,35 +77,34 @@ def erp_ssvep_speller(
     fp2_df.to_csv(fp2_file_path, index=False)
 
     analyze_eeg = AnalyzeEEG(channels=channels, fs=fs)
-    
-    for num in range(len(frequencies)):
-        eeg, eeg_times, avg_evoked_list, times_list = analyze_eeg.analyze_erp(
-            eeg_filename=data_file_path,
-            event_filename=event_file,
-            result_dir=result_dir,
-            num_types=len(frequencies),
-            lowcut=lowcut,
-            highcut=highcut,
-            tmin=tmin,
-            tmax=tmax,
-        )
+    eeg, eeg_times, avg_evoked_list, times_list = analyze_eeg.analyze_erp(
+        eeg_filename=data_file_path,
+        event_filename=event_file,
+        result_dir=result_dir,
+        num_types=len(frequencies),
+        lowcut=lowcut,
+        highcut=highcut,
+        tmin=tmin,
+        tmax=tmax,
+    )
 
-        # times_list = [times[1:] for times in times_list]
+    # times_list = [times[1:] for times in times_list]
 
-        plot_eeg = PlotEEG(
-            channels=channels,
-            result_dir=result_dir,
-            is_show=False,
-            is_save=True,
-            eeg=eeg,
-            eeg_times=eeg_times,
-            eeg_filename=f"{num}_eeg_raw",
-        )
-        plot_eeg.plot_eeg()
+    plot_eeg = PlotEEG(
+        channels=channels,
+        result_dir=result_dir,
+        is_show=False,
+        is_save=True,
+        eeg=eeg,
+        eeg_times=eeg_times,
+        eeg_filename="eeg_raw",
+    )
+    plot_eeg.plot_eeg()
+    for i in range(len(frequencies)):
         plot_eeg.plot_electrode(
-            avg_evoked_list[0],
-            times_list[0],
-            filename=f"{num}_electrode",
+            avg_evoked_list[i],
+            times_list[i],
+            filename=f"speller_{i*2+1}_electrode",
         )
 
     avg_fp1_df = analyze_eeg.analyze_ssvep(
@@ -203,7 +202,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--experiment_duration",
         type=int,
-        default=60,
+        default=64,
         help="Set experiment_duration to use in the task",
     )
     parser.add_argument(
