@@ -7,7 +7,7 @@ import pandas as pd
 from src.task import quiz_task
 from src.analysis import AnalyzeEEG
 from src.plot import plot_ssvep
-from src.recommendation import recommend_answer_ssvep
+from src.recommendation import recommend_answer
 
 def ssvep_quiz(
     screen_width: int,
@@ -81,7 +81,7 @@ def ssvep_quiz(
         save_path=f"{result_dir}/fp2.png",
     )
     
-    recommend_answer_ssvep(
+    recommend_answer(
         fp1_df=avg_fp1_df, 
         fp2_df=avg_fp2_df, 
         screen_width=screen_width, 
