@@ -7,6 +7,7 @@ import pandas as pd
 from src.task import brake_task
 from src.analysis import AnalyzeEEG
 from src.plot import PlotEEG
+from src.recommendation import recommend_direction_and_moment
 
 
 def erds_brake(
@@ -100,6 +101,13 @@ def erds_brake(
             ers_times_list[i],
             filename=f"brake_ers_{i+1}_electrode",
         )
+
+    recommend_direction_and_moment(
+        avg_evoked_list=erd_avg_evoked_list, 
+        times_list=erd_times_list, 
+        channels=channels, 
+        result_dir=result_dir,
+    )
 
 
 if __name__ == "__main__":

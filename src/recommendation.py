@@ -222,7 +222,7 @@ def recommend_celebrity(
     combined_image.show()
 
 
-def recommend_direction_and_timing(
+def recommend_direction_and_moment(
     avg_evoked_list: List, times_list: List, channels: List, result_dir: str,
 ):
     erd_peak_index_per_channel = []
@@ -244,6 +244,7 @@ def recommend_direction_and_timing(
         erd_peak_index_per_channel.append(erd_peak_index)
     
     ers_peak_index_per_channel = []
+    ers_summation_per_channel = []
     for channel_idx in range(len(channels)):
         for num_images in range(len(times_list)):
             ers_selected_indices = [
@@ -259,10 +260,23 @@ def recommend_direction_and_timing(
                     avg_evoked_list[num_images][channel_idx][ers_start_index : ers_end_index + 1]
                 )
             )
+            ers_summation = avg_evoked_list[num_images][channel_idx][ers_start_index : ers_end_index + 1].sum()
         ers_peak_index_per_channel.append(ers_peak_index)
+        ers_summation_per_channel.append(ers_summation)
     
-    for channel_idx in range(len(channels)):
-        pass
+    dominant_channel_index = ers_summation_per_channel.index(max(ers_summation_per_channel))
+    point_of_operation_index = int(erd_peak_index_per_channel[dominant_channel_index] * 0.25 + ers_peak_index_per_channel[dominant_channel_index] * 0.75)
+    point_of_operation = times_list[0][point_of_operation_index]
+    if dominant_channel_index == 0:
+        direction = "right"
+    elif dominant_channel_index == 1:
+        direction = "left"
+    else:
+        raise ValueError("Invalid channel index")
+    moment = f"{float(point_of_operation):.2f} s"
+    direction_and_moment = {"direction" : direction, "moment" : moment}
+    result_df = pd.DataFrame(direction_and_moment)
+    result_df.to_csv(f"{result_dir}/result.csv", index=False)
 
 
 def recommend_answer(

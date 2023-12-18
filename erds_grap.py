@@ -7,6 +7,7 @@ import pandas as pd
 from src.task import grap_task
 from src.analysis import AnalyzeEEG
 from src.plot import PlotEEG
+from src.recommendation import recommend_direction_and_moment
 
 
 def erds_grap(
@@ -122,6 +123,13 @@ def erds_grap(
         erds_whole_avg_evoked_list[0],
         erds_whole_times_list[0],
         filename=f"grap_erds_whole_electrode",
+    )
+
+    recommend_direction_and_moment(
+        avg_evoked_list=erds_avg_evoked_list, 
+        times_list=erds_times_list, 
+        channels=channels, 
+        result_dir=result_dir,
     )
 
 
