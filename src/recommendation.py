@@ -222,7 +222,50 @@ def recommend_celebrity(
     combined_image.show()
 
 
-def recommend_answer_ssvep(
+def recommend_direction_and_timing(
+    avg_evoked_list: List, times_list: List, channels: List, result_dir: str,
+):
+    erd_peak_index_per_channels = []
+    for channel_idx in range(len(channels)):
+        for time in range(len(times_list)):
+            erd_selected_indices = [
+                index
+                for index, value in enumerate(times_list[time])
+                if 0.0 <= value <= 0.5
+            ]
+            erd_start_index = erd_selected_indices[0]
+            erd_end_index = erd_selected_indices[-1]
+
+            erd_peak_index = avg_evoked_list[time][channel_idx].index(
+                min(
+                    avg_evoked_list[time][channel_idx][erd_start_index : erd_end_index + 1]
+                )
+            )
+        erd_peak_index_per_channels.append(erd_peak_index)
+    
+    ers_peak_index_per_channels = []
+    for channel_idx in range(len(channels)):
+        for time in range(len(times_list)):
+            ers_selected_indices = [
+                index
+                for index, value in enumerate(times_list[time])
+                if erd_peak_index_per_channels[channel_idx] <= value <= erd_peak_index_per_channels[channel_idx] + 0.5
+            ]
+            ers_start_index = ers_selected_indices[0]
+            ers_end_index = ers_selected_indices[-1]
+
+            ers_peak_index = avg_evoked_list[time][channel_idx].index(
+                max(
+                    avg_evoked_list[time][channel_idx][ers_start_index : ers_end_index + 1]
+                )
+            )
+        ers_peak_index_per_channels.append(ers_peak_index)
+    
+    for channel_idx in range(len(channels)):
+        pass
+
+
+def recommend_answer(
     fp1_df:pd.DataFrame, fp2_df:pd.DataFrame, screen_width: int, screen_height: int, frequencies: List, image_folder: str, correct_num: int, result_dir: str,
 ):
     combined_df = pd.concat([fp1_df, fp2_df], axis=1)
@@ -300,3 +343,33 @@ def recommend_selection(
     image_filename = f"{image_folder}/{top_index*2+1}.png"
     image = Image.open(image_filename)
     image.show()
+
+
+def recommend_select(
+    fp1_df:pd.DataFrame, fp2_df:pd.DataFrame, frequencies: List, image_folder: str, result_dir: str,
+):
+    # combined_df = pd.concat([fp1_df, fp2_df], axis=1)
+
+    freq_harmonic_sums = []
+    for frequency in frequencies:
+        freq_harmonic_sum = 0
+        # for i in range(1, 4):
+        #     freq_harmonic_sum += fp1_df[f"{float(frequency*i):.2f}Hz"].sum()
+        #     freq_harmonic_sum += fp2_df[f"{float(frequency*i):.2f}Hz"].sum()
+        if frequency == 13:
+            threshold = 2.0
+        elif frequency == 19:
+            threshold = 1.75
+        else:
+            threshold = 1.25
+        freq_harmonic_sum += fp1_df[(fp1_df[f"{float(frequency):.2f}Hz"]>=threshold)][f"{float(frequency):.2f}Hz"].sum()
+        freq_harmonic_sum += fp2_df[(fp2_df[f"{float(frequency):.2f}Hz"]>=threshold)][f"{float(frequency):.2f}Hz"].sum()
+        freq_harmonic_sums.append(freq_harmonic_sum)
+
+    print(freq_harmonic_sums)
+    max_column_index = freq_harmonic_sums.index(max(freq_harmonic_sums))
+    for i in range(len(frequencies)):
+        if i == max_column_index:
+            image_num = i*2+1
+            image = Image.open(f"{image_folder}/{image_num}.png")
+            image.save(f"{result_dir}/select.png")

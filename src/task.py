@@ -5,6 +5,7 @@ from typing import List
 
 import pygame
 import cv2
+import pandas as pd
 
 
 def combination_task(
@@ -196,20 +197,23 @@ def brake_task(
 ):
     pygame.init()
 
-    # 실험 데이터 초기화 및 실험 시작 시간 기록
-    current_time = datetime.datetime.now()
-    hour = str(current_time).split(" ")[1].split(":")[0]
-    min = str(current_time).split(" ")[1].split(":")[1]
-    sec = str(current_time).split(" ")[1].split(":")[2]
-
-    filename = f"{event_save_path}/brake_event_{hour}.{min}.{sec}.csv"
-    with open(filename, mode="w", newline="") as file:
-        writer = csv.writer(file)
-        writer.writerow(["ISI", "RT", "Response", "Stimulus"])
-
-    # event_data = []
+    is_record_begin = False
     for _ in range(num_trials):
         cap = cv2.VideoCapture(background_path)
+        
+        if not is_record_begin:
+            # 실험 데이터 초기화 및 실험 시작 시간 기록
+            current_time = datetime.datetime.now()
+            hour = str(current_time).split(" ")[1].split(":")[0]
+            min = str(current_time).split(" ")[1].split(":")[1]
+            sec = str(current_time).split(" ")[1].split(":")[2]
+
+            filename = f"{event_save_path}/grap_event_{hour}.{min}.{sec}.csv"
+            with open(filename, mode="w", newline="") as file:
+                writer = csv.writer(file)
+                writer.writerow(["ISI", "RT", "Response", "Stimulus"])
+            is_record_begin =  True
+
         # 동영상 재생 및 장애물 이미지 표시
         for num_image in range(num_images):
             obstacle = cv2.imread(f"{image_folder}/O{num_image+1}.png", cv2.IMREAD_UNCHANGED)
@@ -290,20 +294,23 @@ def grap_task(
 ):
     pygame.init()
 
-    # 실험 데이터 초기화 및 실험 시작 시간 기록
-    current_time = datetime.datetime.now()
-    hour = str(current_time).split(" ")[1].split(":")[0]
-    min = str(current_time).split(" ")[1].split(":")[1]
-    sec = str(current_time).split(" ")[1].split(":")[2]
-
-    filename = f"{event_save_path}/grap_event_{hour}.{min}.{sec}.csv"
-    with open(filename, mode="w", newline="") as file:
-        writer = csv.writer(file)
-        writer.writerow(["ISI", "RT", "Response", "Stimulus"])
-
-    # event_data = []
+    is_record_begin = False
     for _ in range(num_trials):
         cap = cv2.VideoCapture(background_path)
+        
+        if not is_record_begin:
+            # 실험 데이터 초기화 및 실험 시작 시간 기록
+            current_time = datetime.datetime.now()
+            hour = str(current_time).split(" ")[1].split(":")[0]
+            min = str(current_time).split(" ")[1].split(":")[1]
+            sec = str(current_time).split(" ")[1].split(":")[2]
+
+            filename = f"{event_save_path}/grap_event_{hour}.{min}.{sec}.csv"
+            with open(filename, mode="w", newline="") as file:
+                writer = csv.writer(file)
+                writer.writerow(["ISI", "RT", "Response", "Stimulus"])
+            is_record_begin =  True
+
         # 동영상 재생 및 장애물 이미지 표시
         for num_image in range(num_images):
             obstacle = cv2.imread(f"{image_folder}/O{num_image+1}.png", cv2.IMREAD_UNCHANGED)
@@ -544,6 +551,11 @@ def selection_task(
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+
+    #바로 시작하므로 첫 ISI = 0
+    event_file = pd.read_csv(f"{event_save_path}/select_event_{hour}.{min}.{sec}.csv")
+    event_file.iloc[0,0] = 0
+    event_file.to_csv(f"{event_save_path}/select_event_{hour}.{min}.{sec}.csv", index=False)
 
     # Pygame 종료
     time.sleep(10)
