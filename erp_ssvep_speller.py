@@ -29,6 +29,7 @@ def erp_ssvep_speller(
     harmonic_range: int = 3,
     early_cut: int = 0,
     scale: str = "min_max",
+    threshold: float = 1.5,
 ):
     today = str(datetime.now().date())
     if not os.path.exists(f"./data/{today}"):
@@ -139,7 +140,11 @@ def erp_ssvep_speller(
         avg_evoked_list=avg_evoked_list,
         times_list=times_list,
         channels=channels,
+        fp1_df=avg_fp1_df,
+        fp2_df=avg_fp2_df,
         image_folder=image_folder,
+        result_dir=result_dir,
+        threshold=threshold,
     )
 
 
@@ -271,6 +276,12 @@ if __name__ == "__main__":
         default="min_max",
         help="Set a scaling option of SSVEP",
     )
+    parser.add_argument(
+        "--threshold",
+        type=float,
+        default=1.5,
+        help="Set a threshold of SSVEP harmonic summation",
+    )
     args = parser.parse_args()
 
     erp_ssvep_speller(
@@ -284,10 +295,13 @@ if __name__ == "__main__":
         experiment_duration=args.experiment_duration,
         event_save_path=f"{args.event_save_path}",
         result_dir=f"{args.result_dir}/speller/{args.result_dir_num}",
-        freq_range=args.freq_range,
+        lowcut=args.lowcut,
+        highcut=args.highcut,
         tmin=args.tmin,
         tmax=args.tmax,
+        freq_range=args.freq_range,
         harmonic_range=args.harmonic_range,
         early_cut=args.early_cut,
         scale=args.scale,
+        threshold=args.threshold,
     )
