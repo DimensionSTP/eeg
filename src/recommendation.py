@@ -1,6 +1,7 @@
 from typing import List
 
 from PIL import Image, ImageDraw, ImageFont
+import numpy as np
 import pandas as pd
 
 
@@ -235,12 +236,10 @@ def recommend_direction_and_moment(
             ]
             erd_start_index = erd_selected_indices[0]
             erd_end_index = erd_selected_indices[-1]
-
-            erd_peak_index = avg_evoked_list[num_images][channel_idx].index(
-                min(
-                    avg_evoked_list[num_images][channel_idx][erd_start_index : erd_end_index + 1]
-                )
+            erd_peak_point = np.argmin(
+                avg_evoked_list[num_images][channel_idx][erd_start_index : erd_end_index + 1]
             )
+            erd_peak_index = erd_selected_indices[erd_peak_point]
         erd_peak_index_per_channel.append(erd_peak_index)
     
     ers_peak_index_per_channel = []
@@ -250,16 +249,14 @@ def recommend_direction_and_moment(
             ers_selected_indices = [
                 index
                 for index, value in enumerate(times_list[num_images])
-                if erd_peak_index_per_channel[channel_idx] <= value <= erd_peak_index_per_channel[channel_idx] + 0.5
+                if times_list[num_images][erd_peak_index_per_channel[channel_idx]] <= value <= times_list[num_images][erd_peak_index_per_channel[channel_idx]] + 0.5
             ]
             ers_start_index = ers_selected_indices[0]
             ers_end_index = ers_selected_indices[-1]
-
-            ers_peak_index = avg_evoked_list[num_images][channel_idx].index(
-                max(
-                    avg_evoked_list[num_images][channel_idx][ers_start_index : ers_end_index + 1]
-                )
+            ers_peak_point = np.argmax(
+                avg_evoked_list[num_images][channel_idx][ers_start_index : ers_end_index + 1]
             )
+            ers_peak_index = ers_selected_indices[ers_peak_point]
             ers_summation = avg_evoked_list[num_images][channel_idx][ers_start_index : ers_end_index + 1].sum()
         ers_peak_index_per_channel.append(ers_peak_index)
         ers_summation_per_channel.append(ers_summation)
@@ -273,8 +270,8 @@ def recommend_direction_and_moment(
         direction = "left"
     else:
         raise ValueError("Invalid channel index")
-    moment = f"{float(point_of_operation):.2f} s"
-    direction_and_moment = {"direction" : direction, "moment" : moment}
+    moment = f"{float(point_of_operation):.2f}"
+    direction_and_moment = {"direction" : [direction], "moment(s)" : [moment]}
     result_df = pd.DataFrame(direction_and_moment)
     result_df.to_csv(f"{result_dir}/result.csv", index=False)
 
