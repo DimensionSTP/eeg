@@ -7,7 +7,7 @@ import pandas as pd
 from src.task import selection_task
 from src.analysis import AnalyzeEEG
 from src.plot import PlotEEG, plot_ssvep
-from src.recommendation import recommend_selection
+from src.recommendation import recommend_select
 
 
 def erp_ssvep_select(
@@ -78,7 +78,6 @@ def erp_ssvep_select(
 
     analyze_eeg = AnalyzeEEG(channels=channels, fs=fs)
     
-    avg_evoked_list_frequencies = []
     for num in range(len(frequencies)):
         eeg, eeg_times, avg_evoked_list, times_list = analyze_eeg.analyze_erp_range(
             eeg_filename=data_file_path,
@@ -92,7 +91,6 @@ def erp_ssvep_select(
         )
 
         # times_list = [times[1:] for times in times_list]
-        # avg_evoked_list_frequencies.append(avg_evoked_list[0])
 
         plot_eeg = PlotEEG(
             channels=channels,
@@ -138,7 +136,7 @@ def erp_ssvep_select(
         save_path=f"{result_dir}/fp2_ssvep.png",
     )
 
-    recommend_selection(
+    recommend_select(
         avg_evoked_list=avg_evoked_list,
         times_list=times_list,
         channels=channels,

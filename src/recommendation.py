@@ -297,7 +297,7 @@ def recommend_answer(
             image.show(f"{result_dir}/answer.png")
 
 
-def recommend_selection(
+def recommend_select(
     avg_evoked_list: List, times_list: List, channels: List, image_folder: str,
 ):
     max_values_per_channels = []
@@ -345,7 +345,7 @@ def recommend_selection(
     image.show()
 
 
-def recommend_select(
+def recommend_speller(
     fp1_df:pd.DataFrame, fp2_df:pd.DataFrame, frequencies: List, image_folder: str, result_dir: str,
 ):
     # combined_df = pd.concat([fp1_df, fp2_df], axis=1)
@@ -361,7 +361,7 @@ def recommend_select(
         elif frequency == 19:
             threshold = 1.75
         else:
-            threshold = 1.25
+            threshold = 1.5
         freq_harmonic_sum += fp1_df[(fp1_df[f"{float(frequency):.2f}Hz"]>=threshold)][f"{float(frequency):.2f}Hz"].sum()
         freq_harmonic_sum += fp2_df[(fp2_df[f"{float(frequency):.2f}Hz"]>=threshold)][f"{float(frequency):.2f}Hz"].sum()
         freq_harmonic_sums.append(freq_harmonic_sum)
