@@ -20,6 +20,7 @@ def ssvep_quiz(
     freq_range: float,
     correct_num: int,
     result_dir: str,
+    harmonic_range: int = 3,
     early_cut: int = 22,
     scale: str = "min_max",
 ):
@@ -60,6 +61,7 @@ def ssvep_quiz(
         frequencies=frequencies,
         freq_range=freq_range,
         result_dir=result_dir,
+        harmonic_range=harmonic_range,
         early_cut=early_cut,
         scale=scale,
     )
@@ -68,6 +70,7 @@ def ssvep_quiz(
         frequencies=frequencies,
         freq_range=freq_range,
         result_dir=result_dir,
+        harmonic_range=harmonic_range,
         early_cut=early_cut,
         scale=scale,
     )
@@ -174,6 +177,12 @@ if __name__ == "__main__":
         help="Set a SSVEP plots detailed saving path",
     )
     parser.add_argument(
+        "--harmonic_range",
+        type=int,
+        default=3,
+        help="Set a range of harmonic summation of SSVEP",
+    )
+    parser.add_argument(
         "--early_cut",
         type=int,
         default=22,
@@ -198,6 +207,7 @@ if __name__ == "__main__":
         freq_range=args.freq_range,
         correct_num=args.correct_num,
         result_dir=f"{args.result_dir}/quiz/{args.result_dir_num}",
+        harmonic_range=args.harmonic_range,
         early_cut=args.early_cut,
         scale=args.scale,
     )

@@ -24,6 +24,7 @@ def erp_ssvep_select(
     freq_range: float = 5.0,
     tmin: float = 0.0,
     tmax: float = 1.0,
+    harmonic_range: int = 3,
     early_cut: int = 0,
     scale: str = "min_max",
 ):
@@ -114,6 +115,7 @@ def erp_ssvep_select(
         frequencies=frequencies,
         freq_range=freq_range,
         result_dir=result_dir,
+        harmonic_range=harmonic_range,
         early_cut=early_cut,
         scale=scale,
     )
@@ -122,6 +124,7 @@ def erp_ssvep_select(
         frequencies=frequencies,
         freq_range=freq_range,
         result_dir=result_dir,
+        harmonic_range=harmonic_range,
         early_cut=early_cut,
         scale=scale,
     )
@@ -242,6 +245,12 @@ if __name__ == "__main__":
         help="Set epoch tmax to get ERP",
     )
     parser.add_argument(
+        "--harmonic_range",
+        type=int,
+        default=3,
+        help="Set a range of harmonic summation of SSVEP",
+    )
+    parser.add_argument(
         "--early_cut",
         type=int,
         default=0,
@@ -269,6 +278,7 @@ if __name__ == "__main__":
         freq_range=args.freq_range,
         tmin=args.tmin,
         tmax=args.tmax,
+        harmonic_range=args.harmonic_range,
         early_cut=args.early_cut,
         scale=args.scale,
     )
