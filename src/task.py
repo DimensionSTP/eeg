@@ -262,7 +262,7 @@ def brake_task(
                         break
                 if response == "HIT":
                     break
-                        # CSV 파일에 결과 기록
+            # CSV 파일에 결과 기록
             with open(filename, mode="a", newline="") as file:
                 writer = csv.writer(file)
                 writer.writerow(
@@ -359,7 +359,7 @@ def grap_task(
                         break
                 if response == "HIT":
                     break
-                        # CSV 파일에 결과 기록
+            # CSV 파일에 결과 기록
             with open(filename, mode="a", newline="") as file:
                 writer = csv.writer(file)
                 writer.writerow(
@@ -560,3 +560,61 @@ def selection_task(
     # Pygame 종료
     time.sleep(10)
     pygame.quit()
+
+
+def speller_task(
+    screen_width: int,
+    screen_height: int,
+    video_path: str,
+    experiment_duration: int,
+    event_save_path: str,
+):
+    is_record_begin = False
+    cap = cv2.VideoCapture(video_path)
+
+    if not is_record_begin:
+        # 실험 데이터 초기화 및 실험 시작 시간 기록
+        current_time = datetime.datetime.now()
+        hour = str(current_time).split(" ")[1].split(":")[0]
+        min = str(current_time).split(" ")[1].split(":")[1]
+        sec = str(current_time).split(" ")[1].split(":")[2]
+
+        filename = f"{event_save_path}/speller_event_{hour}.{min}.{sec}.csv"
+        with open(filename, mode="w", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(["ISI", "RT", "Response", "Stimulus"])
+        is_record_begin =  True
+
+    prev_time = 0
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    total_frame = int(fps * experiment_duration)
+    for _ in range(total_frame):
+        ret, frame = cap.read()
+        current_time = time.time() - prev_time
+        if (ret is True) and (current_time > 1. / fps):
+            frame = cv2.resize(frame, (screen_width, screen_height))
+            prev_time = time.time()
+            cv2.imshow("Video", frame)
+            if cv2.waitKey(1) & 0xFF == ord("q"):
+                break
+
+    # 사용자 입력 기록
+    isi, response, rt = 1000, "CR", 1000
+    # CSV 파일에 결과 기록
+    with open(filename, mode="a", newline="") as file:
+        writer = csv.writer(file)
+        for tick in range(int(experiment_duration / 2)):
+            image_num = (tick % 4) * 2 + 1
+            writer.writerow(
+                [
+                    isi,
+                    rt,
+                    response,
+                    image_num,
+                ]
+            )
+
+    # 동영상 및 Pygame 종료
+    cap.release()
+    cv2.destroyAllWindows()
+    time.sleep(10)
