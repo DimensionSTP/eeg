@@ -10,17 +10,17 @@ def recommend_combination(
     max_values_per_channels = []
     for channel_idx in range(len(channels)):
         max_values = []
-        for time in range(len(times_list)):
+        for num_images in range(len(times_list)):
             selected_indices = [
                 index
-                for index, value in enumerate(times_list[time])
+                for index, value in enumerate(times_list[num_images])
                 if 0.1 <= value <= 0.5
             ]
             start_index = selected_indices[0]
             end_index = selected_indices[-1]
 
             max_value = max(
-                avg_evoked_list[time][channel_idx][start_index : end_index + 1]
+                avg_evoked_list[num_images][channel_idx][start_index : end_index + 1]
             )
             max_values.append(max_value)
         max_values_per_channels.append(max_values)
@@ -100,17 +100,17 @@ def recommend_celebrity(
     max_values_per_channels = []
     for channel_idx in range(len(channels)):
         max_values = []
-        for time in range(len(times_list)):
+        for num_images in range(len(times_list)):
             selected_indices = [
                 index
-                for index, value in enumerate(times_list[time])
+                for index, value in enumerate(times_list[num_images])
                 if 0.1 <= value <= 0.5
             ]
             start_index = selected_indices[0]
             end_index = selected_indices[-1]
 
             max_value = max(
-                avg_evoked_list[time][channel_idx][start_index : end_index + 1]
+                avg_evoked_list[num_images][channel_idx][start_index : end_index + 1]
             )
             max_values.append(max_value)
         max_values_per_channels.append(max_values)
@@ -227,36 +227,36 @@ def recommend_direction_and_timing(
 ):
     erd_peak_index_per_channels = []
     for channel_idx in range(len(channels)):
-        for time in range(len(times_list)):
+        for num_images in range(len(times_list)):
             erd_selected_indices = [
                 index
-                for index, value in enumerate(times_list[time])
+                for index, value in enumerate(times_list[num_images])
                 if 0.0 <= value <= 0.5
             ]
             erd_start_index = erd_selected_indices[0]
             erd_end_index = erd_selected_indices[-1]
 
-            erd_peak_index = avg_evoked_list[time][channel_idx].index(
+            erd_peak_index = avg_evoked_list[num_images][channel_idx].index(
                 min(
-                    avg_evoked_list[time][channel_idx][erd_start_index : erd_end_index + 1]
+                    avg_evoked_list[num_images][channel_idx][erd_start_index : erd_end_index + 1]
                 )
             )
         erd_peak_index_per_channels.append(erd_peak_index)
     
     ers_peak_index_per_channels = []
     for channel_idx in range(len(channels)):
-        for time in range(len(times_list)):
+        for num_images in range(len(times_list)):
             ers_selected_indices = [
                 index
-                for index, value in enumerate(times_list[time])
+                for index, value in enumerate(times_list[num_images])
                 if erd_peak_index_per_channels[channel_idx] <= value <= erd_peak_index_per_channels[channel_idx] + 0.5
             ]
             ers_start_index = ers_selected_indices[0]
             ers_end_index = ers_selected_indices[-1]
 
-            ers_peak_index = avg_evoked_list[time][channel_idx].index(
+            ers_peak_index = avg_evoked_list[num_images][channel_idx].index(
                 max(
-                    avg_evoked_list[time][channel_idx][ers_start_index : ers_end_index + 1]
+                    avg_evoked_list[num_images][channel_idx][ers_start_index : ers_end_index + 1]
                 )
             )
         ers_peak_index_per_channels.append(ers_peak_index)
@@ -303,17 +303,17 @@ def recommend_select(
     max_values_per_channels = []
     for channel_idx in range(len(channels)):
         max_values = []
-        for time in range(len(times_list)):
+        for num_images in range(len(times_list)):
             selected_indices = [
                 index
-                for index, value in enumerate(times_list[time])
+                for index, value in enumerate(times_list[num_images])
                 if 0.1 <= value <= 0.5
             ]
             start_index = selected_indices[0]
             end_index = selected_indices[-1]
 
             max_value = max(
-                avg_evoked_list[time][channel_idx][start_index : end_index + 1]
+                avg_evoked_list[num_images][channel_idx][start_index : end_index + 1]
             )
             max_values.append(max_value)
         max_values_per_channels.append(max_values)
@@ -346,22 +346,19 @@ def recommend_select(
 
 
 def recommend_speller(
-    fp1_df:pd.DataFrame, fp2_df:pd.DataFrame, frequencies: List, image_folder: str, result_dir: str,
+    avg_evoked_list: List, 
+    times_list: List, 
+    channels: List, 
+    fp1_df:pd.DataFrame, 
+    fp2_df:pd.DataFrame, 
+    frequencies: List, 
+    image_folder: str, 
+    result_dir: str, 
+    threshold: float = 1.5,
 ):
-    # combined_df = pd.concat([fp1_df, fp2_df], axis=1)
-
     freq_harmonic_sums = []
     for frequency in frequencies:
         freq_harmonic_sum = 0
-        # for i in range(1, 4):
-        #     freq_harmonic_sum += fp1_df[f"{float(frequency*i):.2f}Hz"].sum()
-        #     freq_harmonic_sum += fp2_df[f"{float(frequency*i):.2f}Hz"].sum()
-        if frequency == 13:
-            threshold = 2.0
-        elif frequency == 19:
-            threshold = 1.75
-        else:
-            threshold = 1.5
         freq_harmonic_sum += fp1_df[(fp1_df[f"{float(frequency):.2f}Hz"]>=threshold)][f"{float(frequency):.2f}Hz"].sum()
         freq_harmonic_sum += fp2_df[(fp2_df[f"{float(frequency):.2f}Hz"]>=threshold)][f"{float(frequency):.2f}Hz"].sum()
         freq_harmonic_sums.append(freq_harmonic_sum)
