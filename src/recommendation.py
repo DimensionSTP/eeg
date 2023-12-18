@@ -7,7 +7,7 @@ import pandas as pd
 def recommend_combination(
     avg_evoked_list: List, times_list: List, channels: List, image_folder: str, clothes_type: str,
 ):
-    max_values_per_channels = []
+    max_values_per_channel = []
     for channel_idx in range(len(channels)):
         max_values = []
         for num_images in range(len(times_list)):
@@ -23,25 +23,25 @@ def recommend_combination(
                 avg_evoked_list[num_images][channel_idx][start_index : end_index + 1]
             )
             max_values.append(max_value)
-        max_values_per_channels.append(max_values)
+        max_values_per_channel.append(max_values)
 
-    indices_of_largest_values_per_channels = []
-    for channel in range(len(max_values_per_channels)):
+    indices_of_largest_values_per_channel = []
+    for channel in range(len(max_values_per_channel)):
         indices_of_largest_values = sorted(
-            range(len(max_values_per_channels[channel])),
-            key=lambda i: max_values_per_channels[channel][i],
+            range(len(max_values_per_channel[channel])),
+            key=lambda i: max_values_per_channel[channel][i],
             reverse=True,
         )[:3]
         largest_values = [
-            max_values_per_channels[channel][i] for i in indices_of_largest_values
+            max_values_per_channel[channel][i] for i in indices_of_largest_values
         ]
         top_values_and_indices = [
             (value, index)
             for value, index in zip(largest_values, indices_of_largest_values)
         ]
-        indices_of_largest_values_per_channels.append(top_values_and_indices)
+        indices_of_largest_values_per_channel.append(top_values_and_indices)
 
-    top_values_and_indices = sum(indices_of_largest_values_per_channels, [])
+    top_values_and_indices = sum(indices_of_largest_values_per_channel, [])
     sorted_top_values_and_indices = sorted(
         top_values_and_indices, key=lambda i: i[0], reverse=True
     )
@@ -97,7 +97,7 @@ def recommend_celebrity(
         "아이유",
         "윤아"
     ]
-    max_values_per_channels = []
+    max_values_per_channel = []
     for channel_idx in range(len(channels)):
         max_values = []
         for num_images in range(len(times_list)):
@@ -113,25 +113,25 @@ def recommend_celebrity(
                 avg_evoked_list[num_images][channel_idx][start_index : end_index + 1]
             )
             max_values.append(max_value)
-        max_values_per_channels.append(max_values)
+        max_values_per_channel.append(max_values)
 
-    indices_of_largest_values_per_channels = []
-    for channel in range(len(max_values_per_channels)):
+    indices_of_largest_values_per_channel = []
+    for channel in range(len(max_values_per_channel)):
         indices_of_largest_values = sorted(
-            range(len(max_values_per_channels[channel])),
-            key=lambda i: max_values_per_channels[channel][i],
+            range(len(max_values_per_channel[channel])),
+            key=lambda i: max_values_per_channel[channel][i],
             reverse=True,
         )[:3]
         largest_values = [
-            max_values_per_channels[channel][i] for i in indices_of_largest_values
+            max_values_per_channel[channel][i] for i in indices_of_largest_values
         ]
         top_values_and_indices = [
             (value, index)
             for value, index in zip(largest_values, indices_of_largest_values)
         ]
-        indices_of_largest_values_per_channels.append(top_values_and_indices)
+        indices_of_largest_values_per_channel.append(top_values_and_indices)
 
-    top_values_and_indices = sum(indices_of_largest_values_per_channels, [])
+    top_values_and_indices = sum(indices_of_largest_values_per_channel, [])
     sorted_top_values_and_indices = sorted(
         top_values_and_indices, key=lambda i: i[0], reverse=True
     )
@@ -225,7 +225,7 @@ def recommend_celebrity(
 def recommend_direction_and_timing(
     avg_evoked_list: List, times_list: List, channels: List, result_dir: str,
 ):
-    erd_peak_index_per_channels = []
+    erd_peak_index_per_channel = []
     for channel_idx in range(len(channels)):
         for num_images in range(len(times_list)):
             erd_selected_indices = [
@@ -241,15 +241,15 @@ def recommend_direction_and_timing(
                     avg_evoked_list[num_images][channel_idx][erd_start_index : erd_end_index + 1]
                 )
             )
-        erd_peak_index_per_channels.append(erd_peak_index)
+        erd_peak_index_per_channel.append(erd_peak_index)
     
-    ers_peak_index_per_channels = []
+    ers_peak_index_per_channel = []
     for channel_idx in range(len(channels)):
         for num_images in range(len(times_list)):
             ers_selected_indices = [
                 index
                 for index, value in enumerate(times_list[num_images])
-                if erd_peak_index_per_channels[channel_idx] <= value <= erd_peak_index_per_channels[channel_idx] + 0.5
+                if erd_peak_index_per_channel[channel_idx] <= value <= erd_peak_index_per_channel[channel_idx] + 0.5
             ]
             ers_start_index = ers_selected_indices[0]
             ers_end_index = ers_selected_indices[-1]
@@ -259,7 +259,7 @@ def recommend_direction_and_timing(
                     avg_evoked_list[num_images][channel_idx][ers_start_index : ers_end_index + 1]
                 )
             )
-        ers_peak_index_per_channels.append(ers_peak_index)
+        ers_peak_index_per_channel.append(ers_peak_index)
     
     for channel_idx in range(len(channels)):
         pass
@@ -300,7 +300,7 @@ def recommend_answer(
 def recommend_select(
     avg_evoked_list: List, times_list: List, channels: List, image_folder: str,
 ):
-    max_values_per_channels = []
+    max_values_per_channel = []
     for channel_idx in range(len(channels)):
         max_values = []
         for num_images in range(len(times_list)):
@@ -316,25 +316,25 @@ def recommend_select(
                 avg_evoked_list[num_images][channel_idx][start_index : end_index + 1]
             )
             max_values.append(max_value)
-        max_values_per_channels.append(max_values)
+        max_values_per_channel.append(max_values)
 
-    indices_of_largest_values_per_channels = []
-    for channel in range(len(max_values_per_channels)):
+    indices_of_largest_values_per_channel = []
+    for channel in range(len(max_values_per_channel)):
         indices_of_largest_values = sorted(
-            range(len(max_values_per_channels[channel])),
-            key=lambda i: max_values_per_channels[channel][i],
+            range(len(max_values_per_channel[channel])),
+            key=lambda i: max_values_per_channel[channel][i],
             reverse=True,
         )[:3]
         largest_values = [
-            max_values_per_channels[channel][i] for i in indices_of_largest_values
+            max_values_per_channel[channel][i] for i in indices_of_largest_values
         ]
         top_values_and_indices = [
             (value, index)
             for value, index in zip(largest_values, indices_of_largest_values)
         ]
-        indices_of_largest_values_per_channels.append(top_values_and_indices)
+        indices_of_largest_values_per_channel.append(top_values_and_indices)
 
-    top_values_and_indices = sum(indices_of_largest_values_per_channels, [])
+    top_values_and_indices = sum(indices_of_largest_values_per_channel, [])
     sorted_top_values_and_indices = sorted(
         top_values_and_indices, key=lambda i: i[0], reverse=True
     )
@@ -356,17 +356,48 @@ def recommend_speller(
     result_dir: str, 
     threshold: float = 1.5,
 ):
-    freq_harmonic_sums = []
-    for frequency in frequencies:
-        freq_harmonic_sum = 0
-        freq_harmonic_sum += fp1_df[(fp1_df[f"{float(frequency):.2f}Hz"]>=threshold)][f"{float(frequency):.2f}Hz"].sum()
-        freq_harmonic_sum += fp2_df[(fp2_df[f"{float(frequency):.2f}Hz"]>=threshold)][f"{float(frequency):.2f}Hz"].sum()
-        freq_harmonic_sums.append(freq_harmonic_sum)
+    max_values_per_channel = []
+    for channel_idx in range(len(channels)):
+        max_values = []
+        for num_images in range(len(times_list)):
+            selected_indices = [
+                index
+                for index, value in enumerate(times_list[num_images])
+                if 0.1 <= value <= 0.5
+            ]
+            start_index = selected_indices[0]
+            end_index = selected_indices[-1]
 
-    print(freq_harmonic_sums)
-    max_column_index = freq_harmonic_sums.index(max(freq_harmonic_sums))
-    for i in range(len(frequencies)):
-        if i == max_column_index:
-            image_num = i*2+1
-            image = Image.open(f"{image_folder}/{image_num}.png")
-            image.save(f"{result_dir}/select.png")
+            max_value = max(
+                avg_evoked_list[num_images][channel_idx][start_index : end_index + 1]
+            )
+            max_values.append(max_value)
+        max_values_per_channel.append(max_values)
+
+    fp_dfs = [fp1_df, fp2_df]
+    freq_harmonic_sums_per_channel = []
+    for fp_df in fp_dfs:
+        freq_harmonic_sums = []
+        for frequency in frequencies:
+            freq_harmonic_sum = 0
+            freq_harmonic_sum += fp_df[(fp_df[f"{float(frequency):.2f}Hz"]>=threshold)][f"{float(frequency):.2f}Hz"].sum()
+            freq_harmonic_sums.append(freq_harmonic_sum)
+        freq_harmonic_sums_per_channel.append(freq_harmonic_sums)
+
+    erp_ssvep_values_per_channel = []
+    for channel_idx in range(len(channels)):
+        erp_ssvep_values = [max_values[channel_idx][i] * freq_harmonic_sums[channel_idx][i] for i in range(len(max_values[channel_idx]))]
+        erp_ssvep_values_per_channel.append(erp_ssvep_values)
+
+    erp_ssvep_value_sums = []
+    for freq in range(len(frequencies)):
+        erp_ssvep_value_sum = 0
+        for erp_ssvep_values_per_ch in erp_ssvep_values_per_channel:
+            erp_ssvep_value_sum += erp_ssvep_values_per_ch[freq]
+        erp_ssvep_value_sums.append(erp_ssvep_value_sum)
+
+    max_column_index = erp_ssvep_value_sums.index(max(erp_ssvep_value_sums))
+    image_num = max_column_index * 2 + 1
+    image = Image.open(f"{image_folder}/{image_num}.png")
+    image.save(f"{result_dir}/speller.png")
+    image.show(f"{result_dir}/speller.png")
