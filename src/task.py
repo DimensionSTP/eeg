@@ -604,7 +604,7 @@ def speller_task(
     with open(filename, mode="a", newline="") as file:
         writer = csv.writer(file)
         for tick in range(int(experiment_duration / 2)):
-            image_num = (tick % 4) * 2 + 1
+            image_num = (tick % 4) + 1
             writer.writerow(
                 [
                     isi,
@@ -615,6 +615,6 @@ def speller_task(
             )
 
     # 동영상 및 Pygame 종료
+    time.sleep(10)
     cap.release()
     cv2.destroyAllWindows()
-    time.sleep(10)
