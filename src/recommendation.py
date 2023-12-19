@@ -397,7 +397,7 @@ def recommend_speller(
 
     erp_ssvep_values_per_channel = []
     for channel_idx in range(len(channels)):
-        erp_ssvep_values = [max_values[channel_idx][i] * freq_harmonic_sums[channel_idx][i] for i in range(len(max_values[channel_idx]))]
+        erp_ssvep_values = [max_values_per_channel[channel_idx][freq_idx] * freq_harmonic_sums_per_channel[channel_idx][freq_idx] for freq_idx in range(len(frequencies))]
         erp_ssvep_values_per_channel.append(erp_ssvep_values)
 
     erp_ssvep_value_sums = []
