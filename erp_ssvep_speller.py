@@ -89,8 +89,6 @@ def erp_ssvep_speller(
         tmax=tmax,
     )
 
-    # times_list = [times[1:] for times in times_list]
-
     plot_eeg = PlotEEG(
         channels=channels,
         result_dir=result_dir,
@@ -142,6 +140,7 @@ def erp_ssvep_speller(
         channels=channels,
         fp1_df=avg_fp1_df,
         fp2_df=avg_fp2_df,
+        frequencies=frequencies,
         image_folder=image_folder,
         result_dir=result_dir,
         threshold=threshold,
@@ -201,7 +200,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--frequencies",
         type=parse_list,
-        default="[9.0, 7.0, 5.0, 11.0]",
+        default="[11.0, 9.0, 7.0, 13.0]",
         help="Get frequencies to use in the task",
     )
     parser.add_argument(
@@ -289,7 +288,7 @@ if __name__ == "__main__":
         screen_height=args.screen_height,
         fs=args.fs,
         channels=args.channels,
-        video_path=f"{args.video_path}/97511.mp4",
+        video_path=f"{args.video_path}/119713.mp4",
         image_folder=f"{args.image_path}/speller",
         frequencies=args.frequencies,
         experiment_duration=args.experiment_duration,
