@@ -615,6 +615,6 @@ def speller_task(
             )
 
     # 동영상 및 Pygame 종료
-    time.sleep(10)
     cap.release()
     cv2.destroyAllWindows()
+    time.sleep(10)
