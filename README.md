@@ -14,7 +14,7 @@ git clone https://github.com/DimensionSTP/eeg.git
 cd eeg
 
 # [OPTIONAL] create conda environment
-conda create -n myenv python=3.8
+conda create -n myenv python=3.7
 conda activate myenv
 
 # install requirements
@@ -23,7 +23,7 @@ pip install -r requirements.txt
 
 ### Before using package
 Only works at Windows OS(Dependancy of EEG device).
-Set the date display setting to yyyyy-mm-dd.
+Set the date display setting to yyyyy-MM-dd.
 Set the time display setting to HH:mm:ss.
 
 ### Full pipeline(experiment to analysis)
