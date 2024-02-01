@@ -36,7 +36,7 @@ def erds_brake(
     if not os.path.exists(f"./event/{today}"):
         os.makedirs(f"./event/{today}")
 
-    brake_task(
+    event_file = brake_task(
         screen_width=screen_width,
         screen_height=screen_height,
         isi=isi,
@@ -61,9 +61,6 @@ def erds_brake(
     data_df = data_df[channels]
     data_file_path = f"./data/{today}/Rawdata_{hour}.{min}.{sec}.csv"
     data_df.to_csv(data_file_path, index=False)
-
-    event_paths = os.listdir(f"./event/{today}")
-    event_file = f"./event/{today}/{event_paths[-1]}"
 
     analyze_eeg = AnalyzeEEG(channels=channels, fs=fs)
     eeg, eeg_times, erd_avg_evoked_list, erd_times_list, ers_avg_evoked_list, ers_times_list = analyze_eeg.analyze_erds(

@@ -37,7 +37,7 @@ def erds_grap(
     if not os.path.exists(f"./event/{today}"):
         os.makedirs(f"./event/{today}")
 
-    grap_task(
+    event_file = grap_task(
         screen_width=screen_width,
         screen_height=screen_height,
         isi=isi,
@@ -62,9 +62,6 @@ def erds_grap(
     data_df = data_df[channels]
     data_file_path = f"./data/{today}/Rawdata_{hour}.{min}.{sec}.csv"
     data_df.to_csv(data_file_path, index=False)
-
-    event_paths = os.listdir(f"./event/{today}")
-    event_file = f"./event/{today}/{event_paths[-1]}"
 
     analyze_eeg = AnalyzeEEG(channels=channels, fs=fs)
     eeg, eeg_times, erds_avg_evoked_list, erds_times_list, erds_whole_avg_evoked_list, erds_whole_times_list = analyze_eeg.analyze_whole_erds(

@@ -100,7 +100,7 @@ def erp_celebrity(
                 filename=f"females_{i+1}_electrode",
             )
     else:
-        raise ValueError("Invalid clothes type")
+        raise ValueError("Invalid sex type")
 
     recommend_celebrity(
         avg_evoked_list=avg_evoked_list,

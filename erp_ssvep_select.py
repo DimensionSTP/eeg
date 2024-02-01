@@ -34,7 +34,7 @@ def erp_ssvep_select(
     if not os.path.exists(f"./event/{today}"):
         os.makedirs(f"./event/{today}")
 
-    selection_task(
+    event_file = selection_task(
         screen_width=screen_width,
         screen_height=screen_height,
         isi=isi,
@@ -57,9 +57,6 @@ def erp_ssvep_select(
     data_df = data_df[channels]
     data_file_path = f"./data/{today}/Rawdata_{hour}.{min}.{sec}.csv"
     data_df.to_csv(data_file_path, index=False)
-
-    event_paths = os.listdir(f"./event/{today}")
-    event_file = f"./event/{today}/{event_paths[-1]}"
 
     fp1_file_name = f"C:/MAVE_RawData/{rawdata_folders[-1]}/Fp1_FFT.txt"
     fp1_df = pd.read_csv(fp1_file_name, delimiter="\t")

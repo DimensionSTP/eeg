@@ -34,7 +34,7 @@ def erp_combination(
     if not os.path.exists(f"./event/{today}"):
         os.makedirs(f"./event/{today}")
 
-    combination_task(
+    event_file = combination_task(
         screen_width=screen_width,
         screen_height=screen_height,
         isi=isi,
@@ -59,9 +59,6 @@ def erp_combination(
     data_df = data_df[channels]
     data_file_path = f"./data/{today}/Rawdata_{hour}.{min}.{sec}.csv"
     data_df.to_csv(data_file_path, index=False)
-
-    event_paths = os.listdir(f"./event/{today}")
-    event_file = f"./event/{today}/{event_paths[-1]}"
 
     analyze_eeg = AnalyzeEEG(channels=channels, fs=fs)
     eeg, eeg_times, avg_evoked_list, times_list = analyze_eeg.analyze_erp(

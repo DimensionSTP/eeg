@@ -37,7 +37,7 @@ def erp_ssvep_speller(
     if not os.path.exists(f"./event/{today}"):
         os.makedirs(f"./event/{today}")
 
-    speller_task(
+    event_file = speller_task(
         screen_width=screen_width,
         screen_height=screen_height,
         video_path=video_path,
@@ -58,9 +58,6 @@ def erp_ssvep_speller(
     data_df = data_df[channels]
     data_file_path = f"./data/{today}/Rawdata_{hour}.{min}.{sec}.csv"
     data_df.to_csv(data_file_path, index=False)
-
-    event_paths = os.listdir(f"./event/{today}")
-    event_file = f"./event/{today}/{event_paths[-1]}"
 
     fp1_file_name = f"C:/MAVE_RawData/{rawdata_folders[-1]}/Fp1_FFT.txt"
     fp1_df = pd.read_csv(fp1_file_name, delimiter="\t")
