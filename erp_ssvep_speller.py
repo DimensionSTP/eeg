@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 
 import pandas as pd
@@ -30,49 +30,58 @@ def erp_ssvep_speller(
     early_cut: int = 0,
     scale: str = "min_max",
     threshold: float = 1.5,
+    mode: Optional[str] = None,
+    event_file: Optional[str] = None,
+    data_file_path: Optional[str] = None,
+    fp1_file_path: Optional[str] = None,
+    fp2_file_path: Optional[str] = None,
 ):
-    today = str(datetime.now().date())
-    if not os.path.exists(f"./data/{today}"):
-        os.makedirs(f"./data/{today}")
-    if not os.path.exists(f"./event/{today}"):
-        os.makedirs(f"./event/{today}")
+    if not mode=="analysis":
+        today = str(datetime.now().date())
+        if not os.path.exists(f"./data/{today}"):
+            os.makedirs(f"./data/{today}")
+        if not os.path.exists(f"./event/{today}"):
+            os.makedirs(f"./event/{today}")
 
-    event_file = speller_task(
-        screen_width=screen_width,
-        screen_height=screen_height,
-        video_path=video_path,
-        experiment_duration=experiment_duration,
-        event_save_path=f"{event_save_path}/{today}",
-    )
+        event_file = speller_task(
+            screen_width=screen_width,
+            screen_height=screen_height,
+            video_path=video_path,
+            experiment_duration=experiment_duration,
+            event_save_path=f"{event_save_path}/{today}",
+        )
 
-    rawdata_folders = os.listdir("C:/MAVE_RawData")
+        rawdata_folders = os.listdir("C:/MAVE_RawData")
 
-    text_file_name = f"C:/MAVE_RawData/{rawdata_folders[-1]}/Rawdata.txt"
-    data_df = pd.read_csv(text_file_name, delimiter="\t")
+        text_file_name = f"C:/MAVE_RawData/{rawdata_folders[-1]}/Rawdata.txt"
+        data_df = pd.read_csv(text_file_name, delimiter="\t")
 
-    record_start_time = data_df.iloc[0, 0]
-    hour = str(record_start_time).split(":")[0]
-    min = str(record_start_time).split(":")[1]
-    sec = str(record_start_time).split(":")[2].split(".")[0]
+        record_start_time = data_df.iloc[0, 0]
+        hour = str(record_start_time).split(":")[0]
+        min = str(record_start_time).split(":")[1]
+        sec = str(record_start_time).split(":")[2].split(".")[0]
 
-    data_df = data_df[channels]
-    data_file_path = f"./data/{today}/Rawdata_{hour}.{min}.{sec}.csv"
-    data_df.to_csv(data_file_path, index=False)
+        data_df = data_df[channels]
+        data_file_path = f"./data/{today}/Rawdata_{hour}.{min}.{sec}.csv"
+        data_df.to_csv(data_file_path, index=False)
 
-    fp1_file_name = f"C:/MAVE_RawData/{rawdata_folders[-1]}/Fp1_FFT.txt"
-    fp1_df = pd.read_csv(fp1_file_name, delimiter="\t")
-    fp2_file_name = f"C:/MAVE_RawData/{rawdata_folders[-1]}/Fp2_FFT.txt"
-    fp2_df = pd.read_csv(fp2_file_name, delimiter="\t")
+        fp1_file_name = f"C:/MAVE_RawData/{rawdata_folders[-1]}/Fp1_FFT.txt"
+        fp1_df = pd.read_csv(fp1_file_name, delimiter="\t")
+        fp2_file_name = f"C:/MAVE_RawData/{rawdata_folders[-1]}/Fp2_FFT.txt"
+        fp2_df = pd.read_csv(fp2_file_name, delimiter="\t")
 
-    record_start_time = fp1_df.iloc[0, 0]
-    hour = str(record_start_time).split(":")[0]
-    min = str(record_start_time).split(":")[1]
-    sec = str(record_start_time).split(":")[2].split(".")[0]
+        record_start_time = fp1_df.iloc[0, 0]
+        hour = str(record_start_time).split(":")[0]
+        min = str(record_start_time).split(":")[1]
+        sec = str(record_start_time).split(":")[2].split(".")[0]
 
-    fp1_file_path = f"./data/{today}/fp1_{hour}.{min}.{sec}.csv"
-    fp1_df.to_csv(fp1_file_path, index=False)
-    fp2_file_path = f"./data/{today}/fp2_{hour}.{min}.{sec}.csv"
-    fp2_df.to_csv(fp2_file_path, index=False)
+        fp1_file_path = f"./data/{today}/fp1_{hour}.{min}.{sec}.csv"
+        fp1_df.to_csv(fp1_file_path, index=False)
+        fp2_file_path = f"./data/{today}/fp2_{hour}.{min}.{sec}.csv"
+        fp2_df.to_csv(fp2_file_path, index=False)
+
+    if mode=="task":
+        return event_file, data_file_path, fp1_file_path, fp2_file_path
 
     analyze_eeg = AnalyzeEEG(channels=channels, fs=fs)
     eeg, eeg_times, avg_evoked_list, times_list = analyze_eeg.analyze_erp(
@@ -278,6 +287,36 @@ if __name__ == "__main__":
         default=1.5,
         help="Set a threshold of SSVEP harmonic summation",
     )
+    parser.add_argument(
+        "--mode",
+        type=Optional[str],
+        default=None,
+        help="Set execution mode",
+    )
+    parser.add_argument(
+        "--event_file",
+        type=Optional[str],
+        default=None,
+        help="Set event file path when mode is analysis",
+    )
+    parser.add_argument(
+        "--data_file_path",
+        type=Optional[str],
+        default=None,
+        help="Set data file path when mode is analysis",
+    )
+    parser.add_argument(
+        "--fp1_file_path",
+        type=Optional[str],
+        default=None,
+        help="Set fp1 file path when mode is analysis",
+    )
+    parser.add_argument(
+        "--fp2_file_path",
+        type=Optional[str],
+        default=None,
+        help="Set fp2 file path when mode is analysis",
+    )
     args = parser.parse_args()
 
     erp_ssvep_speller(
@@ -300,4 +339,9 @@ if __name__ == "__main__":
         early_cut=args.early_cut,
         scale=args.scale,
         threshold=args.threshold,
+        mode=args.mode,
+        event_file=args.event_file,
+        data_file_path=args.data_file_path,
+        fp1_file_path=args.fp1_file_path,
+        fp2_file_path=args.fp2_file_path,
     )

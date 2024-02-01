@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 
 import pandas as pd
@@ -27,38 +27,45 @@ def erp_combination(
     highcut: float = 30.0,
     tmin: float = -0.2,
     tmax: float = 1.0,
+    mode: Optional[str] = None,
+    event_file: Optional[str] = None,
+    data_file_path: Optional[str] = None,
 ):
-    today = str(datetime.now().date())
-    if not os.path.exists(f"./data/{today}"):
-        os.makedirs(f"./data/{today}")
-    if not os.path.exists(f"./event/{today}"):
-        os.makedirs(f"./event/{today}")
+    if not mode=="analysis":
+        today = str(datetime.now().date())
+        if not os.path.exists(f"./data/{today}"):
+            os.makedirs(f"./data/{today}")
+        if not os.path.exists(f"./event/{today}"):
+            os.makedirs(f"./event/{today}")
 
-    event_file = combination_task(
-        screen_width=screen_width,
-        screen_height=screen_height,
-        isi=isi,
-        top_image_path=top_image_path,
-        image_folder=image_folder,
-        num_trials=num_trials,
-        num_images=num_images,
-        event_save_path=f"{event_save_path}/{today}",
-        clothes_type=clothes_type
-    )
+        event_file = combination_task(
+            screen_width=screen_width,
+            screen_height=screen_height,
+            isi=isi,
+            top_image_path=top_image_path,
+            image_folder=image_folder,
+            num_trials=num_trials,
+            num_images=num_images,
+            event_save_path=f"{event_save_path}/{today}",
+            clothes_type=clothes_type
+        )
 
-    rawdata_folders = os.listdir("C:/MAVE_RawData")
+        rawdata_folders = os.listdir("C:/MAVE_RawData")
 
-    text_file_name = f"C:/MAVE_RawData/{rawdata_folders[-1]}/Rawdata.txt"
-    data_df = pd.read_csv(text_file_name, delimiter="\t")
+        text_file_name = f"C:/MAVE_RawData/{rawdata_folders[-1]}/Rawdata.txt"
+        data_df = pd.read_csv(text_file_name, delimiter="\t")
 
-    record_start_time = data_df.iloc[0, 0]
-    hour = str(record_start_time).split(":")[0]
-    min = str(record_start_time).split(":")[1]
-    sec = str(record_start_time).split(":")[2].split(".")[0]
+        record_start_time = data_df.iloc[0, 0]
+        hour = str(record_start_time).split(":")[0]
+        min = str(record_start_time).split(":")[1]
+        sec = str(record_start_time).split(":")[2].split(".")[0]
 
-    data_df = data_df[channels]
-    data_file_path = f"./data/{today}/Rawdata_{hour}.{min}.{sec}.csv"
-    data_df.to_csv(data_file_path, index=False)
+        data_df = data_df[channels]
+        data_file_path = f"./data/{today}/Rawdata_{hour}.{min}.{sec}.csv"
+        data_df.to_csv(data_file_path, index=False)
+
+    if mode=="task":
+        return event_file, data_file_path
 
     analyze_eeg = AnalyzeEEG(channels=channels, fs=fs)
     eeg, eeg_times, avg_evoked_list, times_list = analyze_eeg.analyze_erp(
@@ -224,6 +231,24 @@ if __name__ == "__main__":
         default=1.0,
         help="Set epoch tmax to get ERP",
     )
+    parser.add_argument(
+        "--mode",
+        type=Optional[str],
+        default=None,
+        help="Set execution mode",
+    )
+    parser.add_argument(
+        "--event_file",
+        type=Optional[str],
+        default=None,
+        help="Set event file path when mode is analysis",
+    )
+    parser.add_argument(
+        "--data_file_path",
+        type=Optional[str],
+        default=None,
+        help="Set data file path when mode is analysis",
+    )
     args = parser.parse_args()
 
     erp_combination(
@@ -243,4 +268,7 @@ if __name__ == "__main__":
         highcut=args.highcut,
         tmin=args.tmin,
         tmax=args.tmax,
+        mode=args.mode,
+        event_file=args.event_file,
+        data_file_path=args.data_file_path,
     )

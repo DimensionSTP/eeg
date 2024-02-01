@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 
 import pandas as pd
@@ -29,38 +29,45 @@ def erds_brake(
     ers_highcut: float = 30.0,
     tmin: float = -4.0,
     tmax: float = 4.0,
+    mode: Optional[str] = None,
+    event_file: Optional[str] = None,
+    data_file_path: Optional[str] = None,
 ):
-    today = str(datetime.now().date())
-    if not os.path.exists(f"./data/{today}"):
-        os.makedirs(f"./data/{today}")
-    if not os.path.exists(f"./event/{today}"):
-        os.makedirs(f"./event/{today}")
+    if not mode=="analysis":
+        today = str(datetime.now().date())
+        if not os.path.exists(f"./data/{today}"):
+            os.makedirs(f"./data/{today}")
+        if not os.path.exists(f"./event/{today}"):
+            os.makedirs(f"./event/{today}")
 
-    event_file = brake_task(
-        screen_width=screen_width,
-        screen_height=screen_height,
-        isi=isi,
-        obstacle_playing_time=obstacle_playing_time,
-        background_path=background_path,
-        image_folder=image_folder,
-        num_trials=num_trials,
-        num_images=num_images,
-        event_save_path=f"{event_save_path}/{today}",
-    )
+        event_file = brake_task(
+            screen_width=screen_width,
+            screen_height=screen_height,
+            isi=isi,
+            obstacle_playing_time=obstacle_playing_time,
+            background_path=background_path,
+            image_folder=image_folder,
+            num_trials=num_trials,
+            num_images=num_images,
+            event_save_path=f"{event_save_path}/{today}",
+        )
 
-    rawdata_folders = os.listdir("C:/MAVE_RawData")
+        rawdata_folders = os.listdir("C:/MAVE_RawData")
 
-    text_file_name = f"C:/MAVE_RawData/{rawdata_folders[-1]}/Rawdata.txt"
-    data_df = pd.read_csv(text_file_name, delimiter="\t")
+        text_file_name = f"C:/MAVE_RawData/{rawdata_folders[-1]}/Rawdata.txt"
+        data_df = pd.read_csv(text_file_name, delimiter="\t")
 
-    record_start_time = data_df.iloc[0, 0]
-    hour = str(record_start_time).split(":")[0]
-    min = str(record_start_time).split(":")[1]
-    sec = str(record_start_time).split(":")[2].split(".")[0]
+        record_start_time = data_df.iloc[0, 0]
+        hour = str(record_start_time).split(":")[0]
+        min = str(record_start_time).split(":")[1]
+        sec = str(record_start_time).split(":")[2].split(".")[0]
 
-    data_df = data_df[channels]
-    data_file_path = f"./data/{today}/Rawdata_{hour}.{min}.{sec}.csv"
-    data_df.to_csv(data_file_path, index=False)
+        data_df = data_df[channels]
+        data_file_path = f"./data/{today}/Rawdata_{hour}.{min}.{sec}.csv"
+        data_df.to_csv(data_file_path, index=False)
+
+    if mode=="task":
+        return event_file, data_file_path
 
     analyze_eeg = AnalyzeEEG(channels=channels, fs=fs)
     eeg, eeg_times, erd_avg_evoked_list, erd_times_list, ers_avg_evoked_list, ers_times_list = analyze_eeg.analyze_erds(
@@ -235,6 +242,24 @@ if __name__ == "__main__":
         default=4.0,
         help="Set epoch tmax to get ERDS",
     )
+    parser.add_argument(
+        "--mode",
+        type=Optional[str],
+        default=None,
+        help="Set execution mode",
+    )
+    parser.add_argument(
+        "--event_file",
+        type=Optional[str],
+        default=None,
+        help="Set event file path when mode is analysis",
+    )
+    parser.add_argument(
+        "--data_file_path",
+        type=Optional[str],
+        default=None,
+        help="Set data file path when mode is analysis",
+    )
     args = parser.parse_args()
 
     erds_brake(
@@ -256,4 +281,7 @@ if __name__ == "__main__":
         ers_highcut=args.ers_highcut,
         tmin=args.tmin,
         tmax=args.tmax,
+        mode=args.mode,
+        event_file=args.event_file,
+        data_file_path=args.data_file_path,
     )

@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 
 import pandas as pd
@@ -23,38 +23,45 @@ def ssvep_quiz(
     harmonic_range: int = 3,
     early_cut: int = 22,
     scale: str = "min_max",
+    mode: Optional[str] = None,
+    fp1_file_path: Optional[str] = None,
+    fp2_file_path: Optional[str] = None,
 ):
-    today = str(datetime.now().date())
-    if not os.path.exists(f"./data/{today}"):
-        os.makedirs(f"./data/{today}")
-    if not os.path.exists(f"./event/{today}"):
-        os.makedirs(f"./event/{today}")
+    if not mode=="analysis":
+        today = str(datetime.now().date())
+        if not os.path.exists(f"./data/{today}"):
+            os.makedirs(f"./data/{today}")
+        if not os.path.exists(f"./event/{today}"):
+            os.makedirs(f"./event/{today}")
 
-    quiz_task(
-        screen_width=screen_width,
-        screen_height=screen_height,
-        image_folder=image_folder,
-        frequencies=frequencies,
-        experiment_duration=experiment_duration
-    )
+        quiz_task(
+            screen_width=screen_width,
+            screen_height=screen_height,
+            image_folder=image_folder,
+            frequencies=frequencies,
+            experiment_duration=experiment_duration
+        )
 
-    rawdata_folders = os.listdir("C:/MAVE_RawData")
+        rawdata_folders = os.listdir("C:/MAVE_RawData")
 
-    fp1_file_name = f"C:/MAVE_RawData/{rawdata_folders[-1]}/Fp1_FFT.txt"
-    fp1_df = pd.read_csv(fp1_file_name, delimiter="\t")
-    fp2_file_name = f"C:/MAVE_RawData/{rawdata_folders[-1]}/Fp2_FFT.txt"
-    fp2_df = pd.read_csv(fp2_file_name, delimiter="\t")
+        fp1_file_name = f"C:/MAVE_RawData/{rawdata_folders[-1]}/Fp1_FFT.txt"
+        fp1_df = pd.read_csv(fp1_file_name, delimiter="\t")
+        fp2_file_name = f"C:/MAVE_RawData/{rawdata_folders[-1]}/Fp2_FFT.txt"
+        fp2_df = pd.read_csv(fp2_file_name, delimiter="\t")
 
-    record_start_time = fp1_df.iloc[0, 0]
-    hour = str(record_start_time).split(":")[0]
-    min = str(record_start_time).split(":")[1]
-    sec = str(record_start_time).split(":")[2].split(".")[0]
+        record_start_time = fp1_df.iloc[0, 0]
+        hour = str(record_start_time).split(":")[0]
+        min = str(record_start_time).split(":")[1]
+        sec = str(record_start_time).split(":")[2].split(".")[0]
 
-    fp1_file_path = f"./data/{today}/fp1_{hour}.{min}.{sec}.csv"
-    fp1_df.to_csv(fp1_file_path, index=False)
-    fp2_file_path = f"./data/{today}/fp2_{hour}.{min}.{sec}.csv"
-    fp2_df.to_csv(fp2_file_path, index=False)
-    
+        fp1_file_path = f"./data/{today}/fp1_{hour}.{min}.{sec}.csv"
+        fp1_df.to_csv(fp1_file_path, index=False)
+        fp2_file_path = f"./data/{today}/fp2_{hour}.{min}.{sec}.csv"
+        fp2_df.to_csv(fp2_file_path, index=False)
+
+    if mode=="task":
+        return fp1_file_path, fp2_file_path
+
     analyze_eeg = AnalyzeEEG(channels=channels, fs=fs)
     avg_fp1_df = analyze_eeg.analyze_ssvep(
         fft_filename=fp1_file_path,
@@ -194,6 +201,24 @@ if __name__ == "__main__":
         default="min_max",
         help="Set a scaling option of SSVEP",
     )
+    parser.add_argument(
+        "--mode",
+        type=Optional[str],
+        default=None,
+        help="Set execution mode",
+    )
+    parser.add_argument(
+        "--fp1_file_path",
+        type=Optional[str],
+        default=None,
+        help="Set fp1 file path when mode is analysis",
+    )
+    parser.add_argument(
+        "--fp2_file_path",
+        type=Optional[str],
+        default=None,
+        help="Set fp2 file path when mode is analysis",
+    )
     args = parser.parse_args()
 
     ssvep_quiz(
@@ -210,4 +235,7 @@ if __name__ == "__main__":
         harmonic_range=args.harmonic_range,
         early_cut=args.early_cut,
         scale=args.scale,
+        mode=args.mode,
+        fp1_file_path=args.fp1_file_path,
+        fp2_file_path=args.fp2_file_path,
     )
