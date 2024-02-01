@@ -94,6 +94,7 @@ def combination_task(
                 )
     time.sleep(10)
     pygame.quit()
+    return filename
 
 
 def celebrity_task(
@@ -182,6 +183,7 @@ def celebrity_task(
                 )
     time.sleep(10)
     pygame.quit()
+    return filename
 
 
 def brake_task(
@@ -279,6 +281,7 @@ def brake_task(
     cv2.destroyAllWindows()
     pygame.quit()
     time.sleep(10)
+    return filename
 
 
 def grap_task(
@@ -376,6 +379,7 @@ def grap_task(
     cv2.destroyAllWindows()
     pygame.quit()
     time.sleep(10)
+    return filename
 
 
 def quiz_task(
@@ -560,6 +564,7 @@ def selection_task(
     # Pygame 종료
     time.sleep(10)
     pygame.quit()
+    return filename
 
 
 def speller_task(
@@ -618,3 +623,4 @@ def speller_task(
     cap.release()
     cv2.destroyAllWindows()
     time.sleep(10)
+    return filename
