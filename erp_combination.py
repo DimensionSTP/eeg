@@ -1,5 +1,5 @@
 import os
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from datetime import datetime
 
 import pandas as pd
@@ -14,7 +14,7 @@ def erp_combination(
     screen_width: int,
     screen_height: int,
     fs: int,
-    channels: List,
+    channels: List[str],
     isi: int,
     top_image_path: str,
     clothes_type: str,
@@ -27,10 +27,10 @@ def erp_combination(
     highcut: float = 30.0,
     tmin: float = -0.2,
     tmax: float = 1.0,
-    mode: Optional[str] = None,
-    event_file: Optional[str] = None,
-    data_file_path: Optional[str] = None,
-):
+    mode: str = "all",
+    event_file: str = "",
+    data_file_path: str = "",
+) -> Optional[Tuple[str, str]]:
     if not mode=="analysis":
         today = str(datetime.now().date())
         if not os.path.exists(f"./data/{today}"):
@@ -233,20 +233,20 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--mode",
-        type=Optional[str],
-        default=None,
+        type=str,
+        default="all",
         help="Set execution mode",
     )
     parser.add_argument(
         "--event_file",
-        type=Optional[str],
-        default=None,
+        type=str,
+        default="",
         help="Set event file path when mode is analysis",
     )
     parser.add_argument(
         "--data_file_path",
-        type=Optional[str],
-        default=None,
+        type=str,
+        default="",
         help="Set data file path when mode is analysis",
     )
     args = parser.parse_args()

@@ -1,5 +1,5 @@
 import os
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from datetime import datetime
 
 import pandas as pd
@@ -14,10 +14,10 @@ def erp_ssvep_speller(
     screen_width: int,
     screen_height: int,
     fs: int,
-    channels: List,
+    channels: List[str],
     video_path: str,
     image_folder: str,
-    frequencies: List,
+    frequencies: List[float],
     experiment_duration: int,
     event_save_path: str,
     result_dir: str,
@@ -30,12 +30,12 @@ def erp_ssvep_speller(
     early_cut: int = 0,
     scale: str = "min_max",
     threshold: float = 1.5,
-    mode: Optional[str] = None,
-    event_file: Optional[str] = None,
-    data_file_path: Optional[str] = None,
-    fp1_file_path: Optional[str] = None,
-    fp2_file_path: Optional[str] = None,
-):
+    mode: str = "all",
+    event_file: str = "",
+    data_file_path: str = "",
+    fp1_file_path: str = "",
+    fp2_file_path: str = "",
+) -> Optional[Tuple[str, str, str, str]]:
     if not mode=="analysis":
         today = str(datetime.now().date())
         if not os.path.exists(f"./data/{today}"):
@@ -289,32 +289,32 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--mode",
-        type=Optional[str],
-        default=None,
+        type=str,
+        default="all",
         help="Set execution mode",
     )
     parser.add_argument(
         "--event_file",
-        type=Optional[str],
-        default=None,
+        type=str,
+        default="",
         help="Set event file path when mode is analysis",
     )
     parser.add_argument(
         "--data_file_path",
-        type=Optional[str],
-        default=None,
+        type=str,
+        default="",
         help="Set data file path when mode is analysis",
     )
     parser.add_argument(
         "--fp1_file_path",
-        type=Optional[str],
-        default=None,
+        type=str,
+        default="",
         help="Set fp1 file path when mode is analysis",
     )
     parser.add_argument(
         "--fp2_file_path",
-        type=Optional[str],
-        default=None,
+        type=str,
+        default="",
         help="Set fp2 file path when mode is analysis",
     )
     args = parser.parse_args()

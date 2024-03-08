@@ -1,5 +1,5 @@
 import os
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from datetime import datetime
 
 import pandas as pd
@@ -9,13 +9,14 @@ from src.analysis import AnalyzeEEG
 from src.plot import plot_ssvep
 from src.recommendation import recommend_answer
 
+
 def ssvep_quiz(
     screen_width: int,
     screen_height: int,
     fs: int,
-    channels: List,
+    channels: List[str],
     image_folder: str,
-    frequencies: List,
+    frequencies: List[int],
     experiment_duration: int,
     freq_range: float,
     correct_num: int,
@@ -23,10 +24,10 @@ def ssvep_quiz(
     harmonic_range: int = 3,
     early_cut: int = 22,
     scale: str = "min_max",
-    mode: Optional[str] = None,
-    fp1_file_path: Optional[str] = None,
-    fp2_file_path: Optional[str] = None,
-):
+    mode: str = "all",
+    fp1_file_path: str = "",
+    fp2_file_path: str = "",
+) -> Optional[Tuple[str, str]]:
     if not mode=="analysis":
         today = str(datetime.now().date())
         if not os.path.exists(f"./data/{today}"):
@@ -203,20 +204,20 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--mode",
-        type=Optional[str],
-        default=None,
+        type=str,
+        default="all",
         help="Set execution mode",
     )
     parser.add_argument(
         "--fp1_file_path",
-        type=Optional[str],
-        default=None,
+        type=str,
+        default="",
         help="Set fp1 file path when mode is analysis",
     )
     parser.add_argument(
         "--fp2_file_path",
-        type=Optional[str],
-        default=None,
+        type=str,
+        default="",
         help="Set fp2 file path when mode is analysis",
     )
     args = parser.parse_args()
