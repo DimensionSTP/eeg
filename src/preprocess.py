@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 import copy
 
 import numpy as np
@@ -9,18 +9,28 @@ from sklearn.decomposition import FastICA
 
 
 class PreprocessEEG:
-    def __init__(self, channels: List, fs: int):
+    def __init__(
+        self, 
+        channels: List[str], 
+        fs: int,
+    ) -> None:
         self.filter_signal = FilterSignal(fs=fs, order=2)
         self.channels = channels
         self.fs = fs
 
-    def read_eeg(self, filename: str):
+    def read_eeg(
+        self, 
+        filename: str,
+    ) -> Tuple[np.ndarray, np.ndarray]:
         eeg = np.loadtxt(filename, skiprows=1, delimiter=",")
         eeg = np.transpose(eeg)
         times = [i / float(self.fs) for i in range(len(eeg[0]))]
         return eeg, times
 
-    def read_events(self, filename: str):
+    def read_events(
+        self, 
+        filename: str,
+    ) -> List[float]:
         data = pd.read_csv(filename)
         stimuli = data["Stimulus"]
         indices = data["ISI"].cumsum() + data["RT"].cumsum() - data["RT"][0]
@@ -29,7 +39,10 @@ class PreprocessEEG:
             events.append([int(indices[i] * self.fs / 1000.0), 0, stimuli[i]])
         return events
 
-    def extract_eeg_each_channel(self, eeg):
+    def extract_eeg_each_channel(
+        self, 
+        eeg: np.ndarray,
+    ) -> List[np.ndarray]:
         eeg_each_channel = []
         for i in range(len(self.channels)):
             remove_channels = []
@@ -41,7 +54,12 @@ class PreprocessEEG:
             eeg_each_channel.append(eeg_tmp)
         return eeg_each_channel
 
-    def synchronize_time_interval(self, events, eeg_start_tm, event_start_tm):
+    def synchronize_time_interval(
+        self, 
+        events: List[float], 
+        eeg_start_tm: str, 
+        event_start_tm: str,
+    ) -> List[list]:
         # Parse eeg timestamp
         eeg_t_tokens = np.array(eeg_start_tm.split(".")).astype("float")
         eeg_start_tm = (
@@ -66,7 +84,14 @@ class PreprocessEEG:
 
         return events
 
-    def epochs(self, eeg, events, event_id, tmin: float, tmax: float):
+    def epochs(
+        self, 
+        eeg: np.ndarray, 
+        events: List[list], 
+        event_id: int, 
+        tmin: float, 
+        tmax: float,
+    ) -> Tuple[np.ndarray, np.ndarray]:
         evoked = []
         times = []
         tmin_idx = tmin * self.fs
@@ -104,24 +129,42 @@ class PreprocessEEG:
 
         return avg_evoked, times
 
-    def filter(self, eeg, lowcut: int, highcut: int):
+    def filter(
+        self, 
+        eeg: np.ndarray, 
+        lowcut: float, 
+        highcut: float,
+    ) -> None:
         for i in range(len(eeg)):
             eeg[i] = self.filter_signal.butter_bandpass_filter(eeg[i], lowcut, highcut)
 
-    def normalize(self, eeg):
+    def normalize(
+        self, 
+        eeg: np.ndarray,
+    ) -> np.ndarray:
         eeg *= 10000
         return eeg
 
-    def ica(self, evoked, n_components=3):
+    def ica(
+        self, 
+        evoked: np.ndarray, 
+        n_components: int=3,
+    ) -> Tuple[np.ndarray, np.ndarray]:
         fast_ica = FastICA(n_components=n_components)
         S_ = fast_ica.fit_transform(np.transpose(evoked))  # Reconstruct signals
         A_ = fast_ica.mixing_  # Get estimated mixing matrix
         return np.transpose(S_), np.transpose(A_)
 
-    def square(self, eeg):
+    def square(
+        self, 
+        eeg: np.ndarray,
+    ) -> np.ndarray:
         return eeg**2
 
-    def moving_average(self, signal):
+    def moving_average(
+        self, 
+        signal: np.ndarray,
+    ) -> np.ndarray:
         window_size = self.fs
         ma_signal = []
         for s in signal:

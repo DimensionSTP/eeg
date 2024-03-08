@@ -6,8 +6,12 @@ import pandas as pd
 
 
 def recommend_combination(
-    avg_evoked_list: List, times_list: List, channels: List, image_folder: str, clothes_type: str,
-):
+    avg_evoked_list: List[np.ndarray], 
+    times_list: List[np.ndarray], 
+    channels: List[str], 
+    image_folder: str, 
+    clothes_type: str,
+) -> None:
     max_values_per_channel = []
     for channel_idx in range(len(channels)):
         max_values = []
@@ -70,8 +74,15 @@ def recommend_combination(
 
 
 def recommend_celebrity(
-    avg_evoked_list: List, times_list: List, channels: List, sex: str, image_folder: str, result_dir: str, screen_width: int, screen_height: int,
-):
+    avg_evoked_list: List[np.ndarray], 
+    times_list: List[np.ndarray], 
+    channels: List[str], 
+    sex: str, 
+    image_folder: str, 
+    result_dir: str, 
+    screen_width: int, 
+    screen_height: int,
+) -> None:
     male_celebrities = [
         "공유",
         "송중기",
@@ -224,8 +235,11 @@ def recommend_celebrity(
 
 
 def recommend_direction_and_moment(
-    avg_evoked_list: List, times_list: List, channels: List, result_dir: str,
-):
+    avg_evoked_list: List[np.ndarray], 
+    times_list: List[np.ndarray], 
+    channels: List[str], 
+    result_dir: str,
+) -> None:
     erd_peak_index_per_channel = []
     for channel_idx in range(len(channels)):
         for num_images in range(len(times_list)):
@@ -277,8 +291,15 @@ def recommend_direction_and_moment(
 
 
 def recommend_answer(
-    fp1_df:pd.DataFrame, fp2_df:pd.DataFrame, screen_width: int, screen_height: int, frequencies: List, image_folder: str, correct_num: int, result_dir: str,
-):
+    fp1_df:pd.DataFrame, 
+    fp2_df:pd.DataFrame, 
+    screen_width: int, 
+    screen_height: int, 
+    frequencies: List[int], 
+    image_folder: str, 
+    correct_num: int, 
+    result_dir: str,
+) -> None:
     combined_df = pd.concat([fp1_df, fp2_df], axis=1)
     max_values = combined_df.max()
     max_column_name = max_values.idxmax()
@@ -309,8 +330,11 @@ def recommend_answer(
 
 
 def recommend_select(
-    avg_evoked_list: List, times_list: List, channels: List, image_folder: str,
-):
+    avg_evoked_list: List[np.ndarray], 
+    times_list: List[np.ndarray], 
+    channels: List[str], 
+    image_folder: str,
+) -> None:
     max_values_per_channel = []
     for channel_idx in range(len(channels)):
         max_values = []
@@ -357,16 +381,16 @@ def recommend_select(
 
 
 def recommend_speller(
-    avg_evoked_list: List, 
-    times_list: List, 
-    channels: List, 
+    avg_evoked_list: List[np.ndarray], 
+    times_list: List[np.ndarray], 
+    channels: List[str], 
     fp1_df:pd.DataFrame, 
     fp2_df:pd.DataFrame, 
-    frequencies: List, 
+    frequencies: List[float], 
     image_folder: str, 
     result_dir: str, 
     threshold: float = 1.5,
-):
+) -> None:
     max_values_per_channel = []
     for channel_idx in range(len(channels)):
         max_values = []

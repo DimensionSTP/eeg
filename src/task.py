@@ -18,7 +18,7 @@ def combination_task(
     num_images: int,
     event_save_path: str,
     clothes_type: str,
-):
+) -> str:
     pygame.init()
 
     screen = pygame.display.set_mode((screen_width, screen_height))
@@ -107,7 +107,7 @@ def celebrity_task(
     num_images: int,
     event_save_path: str,
     sex: str,
-):
+) -> str:
     pygame.init()
 
     screen = pygame.display.set_mode((screen_width, screen_height))
@@ -196,7 +196,7 @@ def brake_task(
     num_trials: int,
     num_images: int,
     event_save_path: str,
-):
+) -> str:
     pygame.init()
 
     is_record_begin = False
@@ -294,7 +294,7 @@ def grap_task(
     num_trials: int,
     num_images: int,
     event_save_path: str,
-):
+) -> str:
     pygame.init()
 
     is_record_begin = False
@@ -388,7 +388,7 @@ def quiz_task(
     image_folder: str,
     frequencies: List,
     experiment_duration: int,
-):
+) -> None:
     # Pygame 초기화
     pygame.init()
 
@@ -466,7 +466,7 @@ def selection_task(
     frequencies: List,
     experiment_duration: int,
     event_save_path: str,
-):
+) -> str:
     # Pygame 초기화
     pygame.init()
 
@@ -573,7 +573,7 @@ def speller_task(
     video_path: str,
     experiment_duration: int,
     event_save_path: str,
-):
+) -> str:
     is_record_begin = False
     cap = cv2.VideoCapture(video_path)
 

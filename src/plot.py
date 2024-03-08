@@ -1,21 +1,24 @@
 import os
-from typing import List
+from typing import List, Tuple
 
-import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.axes import Axes
 
 
 class PlotEEG:
     def __init__(
         self,
-        channels: List,
+        channels: List[str],
         result_dir: str,
         is_show: bool,
         is_save: bool,
-        eeg,
-        eeg_times,
+        eeg: np.ndarray,
+        eeg_times: np.ndarray,
         eeg_filename: str,
-    ):
+    ) -> None:
         self.channels = channels
         self.result_dir = result_dir
         self.is_show = is_show
@@ -24,7 +27,13 @@ class PlotEEG:
         self.eeg_times = eeg_times
         self.eeg_filename = eeg_filename
 
-    def init_plots(self, n_plots, width=6, height=2.5, is_line=False):
+    def init_plots(
+        self, 
+        n_plots: int, 
+        width: int=6, 
+        height: float=2.5, 
+        is_line: bool=False,
+    ) -> Tuple[Figure, Axes]:
         fig, axarr = plt.subplots(
             n_plots, sharex=True, figsize=(width, height * n_plots)
         )
@@ -36,17 +45,17 @@ class PlotEEG:
 
     def plot_data(
         self,
-        axis,
-        x,
-        y,
-        title="",
-        fontsize=10,
-        labelsize=8,
-        color="salmon",
-        xlabel="",
-        ylabel="",
-        linewidth=0.5,
-    ):
+        axis: Axes,
+        x: np.ndarray,
+        y: np.ndarray,
+        title: str="",
+        fontsize: int=10,
+        labelsize: int=8,
+        color: str="salmon",
+        xlabel: str="",
+        ylabel: str="",
+        linewidth: float=0.5,
+    ) -> None:
         axis.set_title(title, fontsize=fontsize)
         axis.grid(which="both", axis="both", linestyle="--")
         axis.tick_params(labelsize=labelsize)
@@ -55,22 +64,31 @@ class PlotEEG:
         axis.autoscale(tight=True)
         axis.plot(x, y, color=color, zorder=1, linewidth=linewidth)
 
-    def plot_points(self, axis, values, indices):
+    def plot_points(
+        self, 
+        axis: Axes, 
+        values: np.ndarray, 
+        indices: List[int],
+    ) -> None:
         axis.scatter(x=indices, y=values[indices], c="black", s=50, zorder=2)
 
-    def show_plot(self):
+    def show_plot(self) -> None:
         plt.show()
         plt.clf()
         plt.close()
 
-    def save_plot(self, fig, filename: str):
+    def save_plot(
+        self, 
+        fig: Figure, 
+        filename: str,
+    ) -> None:
         fig.savefig(filename)
 
-    def clean_plot(self):
+    def clean_plot(self) -> None:
         plt.clf()
         plt.close()
 
-    def plot_eeg(self):
+    def plot_eeg(self) -> None:
         fig, axarr = self.init_plots(1)
         for i in range(len(self.eeg)):  # For electrode
             self.plot_data(
@@ -92,10 +110,10 @@ class PlotEEG:
 
     def plot_electrode(
         self,
-        avg_evoked: List,
-        times: List,
+        avg_evoked: List[np.ndarray],
+        times: List[np.ndarray],
         filename: str,
-    ):
+    ) -> None:
         for i in range(len(avg_evoked)):  # For electrode
             fig, axarr = self.init_plots(1, is_line=True)
             self.plot_data(
@@ -127,7 +145,7 @@ def plot_ssvep(
     df: pd.DataFrame,
     save_path: str,
     figsize: tuple = (15,8),
-):
+) -> None:
     plt.figure(figsize=figsize)
     for freq, values in df.items():
         plt.plot(df.index, values, label=f"Average around {freq}")

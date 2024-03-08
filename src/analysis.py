@@ -1,7 +1,8 @@
 import os
 import copy
-from typing import List
+from typing import List, Tuple
 
+import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
@@ -9,7 +10,11 @@ from .preprocess import PreprocessEEG
 
 
 class AnalyzeEEG:
-    def __init__(self, channels: List, fs: int):
+    def __init__(
+        self, 
+        channels: List[str], 
+        fs: int,
+        ) -> None:
         self.preprocess_eeg = PreprocessEEG(channels, fs)
 
     def analyze_erp(
@@ -22,7 +27,7 @@ class AnalyzeEEG:
         highcut: float = 30.0,
         tmin: float = -0.2,
         tmax: float = 1.0,
-    ):
+    ) -> Tuple[np.ndarray, np.ndarray, List[np.ndarray], List[np.ndarray]]:
         # Check result directory
         if not os.path.isdir(result_dir):
             os.makedirs(result_dir)
@@ -62,7 +67,7 @@ class AnalyzeEEG:
         freq_range: float = 2.0,
         tmin: float = 0.0,
         tmax: float = 1.0,
-    ):
+    ) -> Tuple[np.ndarray, np.ndarray, List[np.ndarray], List[np.ndarray]]:
         # Check result directory
         if not os.path.isdir(result_dir):
             os.makedirs(result_dir)
@@ -103,7 +108,7 @@ class AnalyzeEEG:
         ers_highcut: float = 30.0,
         tmin: float = -4.0,
         tmax: float = 4.0,
-    ):
+    ) -> Tuple[np.ndarray, np.ndarray, List[np.ndarray], List[np.ndarray], List[np.ndarray], List[np.ndarray]]:
         # Check result directory
         if not os.path.isdir(result_dir):
             os.makedirs(result_dir)
@@ -170,7 +175,7 @@ class AnalyzeEEG:
         erds_whole_highcut: float = 30.0,
         tmin: float = -4.0,
         tmax: float = 4.0,
-    ):
+    ) -> Tuple[np.ndarray, np.ndarray, List[np.ndarray], List[np.ndarray], List[np.ndarray], List[np.ndarray]]:
         # Check result directory
         if not os.path.isdir(result_dir):
             os.makedirs(result_dir)
@@ -227,13 +232,13 @@ class AnalyzeEEG:
     def analyze_ssvep(
         self,
         fft_filename: str,
-        frequencies: List,
+        frequencies: List[int],
         freq_range: float,
         result_dir: str,
         harmonic_range: int = 3,
         early_cut: int = 22,
-        scale: str = "min_max"
-    ):
+        scale: str = "min_max",
+    ) -> pd.DataFrame:
         # Check result directory
         if not os.path.isdir(result_dir):
             os.makedirs(result_dir)
